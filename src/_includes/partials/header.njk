@@ -13,7 +13,7 @@
         {%- endfor %}
       </ul>
       <div class="site-nav__mobile-actions">
-        {{ ui.contact(site, label='Get a free quote') }}
+        {{ ui.contact(site) }}
       </div>
     </nav>
 
@@ -21,7 +21,7 @@
       {% if site.phone -%}
       <a class="header-phone" href="{{ site.phone | tel }}" aria-label="Call {{ site.phoneDisplay or site.phone }}">{{ ui.icon('phone-fill') }}<span>{{ site.phoneDisplay or site.phone }}</span></a>
       {%- endif %}
-      <button class="btn btn--primary btn--sm header-cta" type="button" data-quote>Get a quote</button>
+      <button class="btn btn--primary header-cta" type="button" data-quote>Get a quote</button>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
         <span class="sr-only">Menu</span>
         <span class="nav-toggle__bars" aria-hidden="true"></span>

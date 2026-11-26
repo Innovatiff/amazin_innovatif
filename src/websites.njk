@@ -3,36 +3,38 @@ layout: layouts/base.njk
 permalink: /websites.html
 key: websites
 accent: web
+backdrop: grid
 shareImage: web-hero
 title: Business websites from $49.99/month | Innovatif
 description: Professional, mobile-friendly websites for local businesses. Two simple plans — Starter at $49.99/month and Pro at $99.99/month — designed, built and hosted by Innovatif.
 ---
 {% import "ui.njk" as ui %}
 
-<section class="page-hero page-hero--split page-hero--media-lg">
+<section class="page-hero">
+  <div class="backdrop backdrop--grid" aria-hidden="true"></div>
   <div class="container">
     <div class="page-hero__text">
-      {{ ui.eyebrow('Websites', 'browser') }}
-      <h1>A website your customers will trust</h1>
-      <p class="lead">Fast, good-looking and easy to use on a phone. We design it, write it, host it and look after it — you just answer the enquiries.</p>
+      {{ ui.eyebrow('Websites', '🌐') }}
+      <h1>A website that <span class="grad">wins customers.</span></h1>
+      <p class="lead">Designed for you, built for phones, live in days. From {{ plans.websites[0].price }} a month.</p>
       <div class="actions">
-        <a class="btn btn--primary" href="#plans">See the plans {{ ui.icon('arrow-right') }}</a>
-        <button class="btn btn--outline" type="button" data-quote data-service="Websites">{{ ui.icon('chat-circle-text-fill') }}<span>Ask a question</span></button>
+        <a class="btn btn--accent btn--lg" href="#plans">See the plans</a>
+        <button class="more" type="button" data-quote data-service="Websites">Ask a question{{ ui.icon('caret-right') }}</button>
       </div>
-      <p class="page-hero__note">{{ ui.icon('timer') }}<span>Most sites are live within days of receiving your details.</span></p>
+      <p class="page-hero__note">We design it, write it, host it and look after it. You just answer the enquiries.</p>
     </div>
-    <div class="page-hero__media page-hero__media--wide">
-      {{ ui.wide('web-hero', 'The same website shown on a desktop monitor, laptop, tablet and phone', '(min-width: 900px) 46vw, 94vw') }}
+    <div class="page-hero__media">
+      {{ ui.wide('web-hero', 'The same website shown on a desktop monitor, laptop, tablet and phone') }}
     </div>
   </div>
 </section>
 
 <section class="section" id="plans">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('Website plans', 'tag') }}
-      <h2>Two plans. No surprises.</h2>
-      <p class="lead">Pick the one that fits today — you can move up whenever your business is ready.</p>
+    <header class="section-head">
+      <p class="eyebrow">Website plans</p>
+      <h2>Two plans. <span class="grad">No surprises.</span></h2>
+      <p class="lead">Pick the one that fits today. Move up whenever your business is ready.</p>
     </header>
 
     <div class="plans plans--2">
@@ -45,6 +47,7 @@ description: Professional, mobile-friendly websites for local businesses. Two si
         </header>
         <div class="plan__price">
           <p class="plan__amount"><strong>{{ plan.price }}</strong><span>{{ plan.period }}</span></p>
+          <p class="plan__perday">About ${{ ((plan.price | replace('$', '') | float) / 30) | round(2) }} a day</p>
           <p class="plan__meta"><span>{{ ui.icon('timer') }}{{ plan.ready }}</span></p>
         </div>
         <ul class="plan__features">
@@ -61,16 +64,17 @@ description: Professional, mobile-friendly websites for local businesses. Two si
   </div>
 </section>
 
-<section class="section section--soft" id="included">
+<section class="section section--flush-top" id="included">
   <div class="container">
     <header class="section-head">
-      {{ ui.eyebrow('Every website', 'check-circle-fill') }}
-      <h2>Built properly, whichever plan you choose</h2>
+      <p class="eyebrow">Every website</p>
+      <h2>Built properly. <span class="grad">Every time.</span></h2>
+      <p class="lead">Whichever plan you choose, this comes as standard.</p>
     </header>
-    <div class="grid grid--3">
+    <div class="grid grid--3 grid--rows-sm">
       {% for item in plans.websiteExtras -%}
       <div class="card">
-        <span class="card__icon">{{ ui.icon(item.icon) }}</span>
+        {{ ui.emojiTile(item.emoji) }}
         <h3>{{ item.title }}</h3>
         <p>{{ item.text }}</p>
       </div>
@@ -80,10 +84,11 @@ description: Professional, mobile-friendly websites for local businesses. Two si
 </section>
 
 <section class="section" id="examples">
+  <div class="backdrop backdrop--grid" aria-hidden="true"></div>
   <div class="container">
     <header class="section-head">
-      {{ ui.eyebrow('For every kind of business', 'storefront') }}
-      <h2>Designed around what you do</h2>
+      <p class="eyebrow">For every kind of business</p>
+      <h2>Designed around <span class="grad">what you do.</span></h2>
       <p class="lead">A restaurant, a barber and a contractor need very different websites. Yours is designed for your customers — not squeezed into a template.</p>
     </header>
     <div class="gallery">
@@ -97,12 +102,12 @@ description: Professional, mobile-friendly websites for local businesses. Two si
   </div>
 </section>
 
-<section class="section section--soft" id="found">
+<section class="section section--flush-top" id="found">
   <div class="container split split--reverse">
     <div class="split__text">
-      {{ ui.eyebrow('Get found', 'map-pin') }}
-      <h2>Be the business people find first</h2>
-      <p class="lead">When someone nearby searches for what you do, your website and business profile should show up looking open, trusted and easy to reach.</p>
+      {{ ui.eyebrow('Get found', '📍') }}
+      <h2>Be the business people <span class="grad">find first.</span></h2>
+      <p class="lead">When someone nearby searches for what you do, you should show up looking open, trusted and easy to reach.</p>
       <ul class="ticks">
         <li>{{ ui.icon('check') }}<span>Pages structured so search engines understand them</span></li>
         <li>{{ ui.icon('check') }}<span>Call, directions and website buttons that just work</span></li>
@@ -115,11 +120,11 @@ description: Professional, mobile-friendly websites for local businesses. Two si
   </div>
 </section>
 
-<section class="section" id="process">
+<section class="section section--flush-top" id="process">
   <div class="container split">
     <div class="split__text">
-      {{ ui.eyebrow('How it works', 'lightning') }}
-      <h2>Live in days, not months</h2>
+      {{ ui.eyebrow('How it works', '⚡') }}
+      <h2>Live in days, <span class="grad">not months.</span></h2>
       <ol class="ticks">
         <li>{{ ui.icon('check') }}<span><strong>Send us your details.</strong> Business name, services, contact info, hours and any photos or logo you have.</span></li>
         <li>{{ ui.icon('check') }}<span><strong>We design and write it.</strong> You get a preview to review on your own phone.</span></li>
@@ -128,7 +133,7 @@ description: Professional, mobile-friendly websites for local businesses. Two si
       </ol>
       <div>
         <p class="fineprint fineprint--left">Popular add-ons</p>
-        <ul class="chips chips--lg">
+        <ul class="chips">
           {% for addon in plans.websiteAddons %}<li>{{ addon }}</li>{% endfor %}
         </ul>
       </div>
@@ -139,17 +144,16 @@ description: Professional, mobile-friendly websites for local businesses. Two si
   </div>
 </section>
 
-<section class="section section--soft" id="faq">
+<section class="section section--flush-top" id="faq">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('Questions', 'question') }}
-      <h2>Website questions, answered</h2>
+    <header class="section-head">
+      <h2>Website questions, <span class="grad">answered.</span></h2>
     </header>
     {{ ui.faqs(plans.websiteFaqs, true) }}
   </div>
 </section>
 
-{% set ctaTitle = 'Let’s get your business online' %}
+{% set ctaTitle = 'Let’s get your business <span class="grad">online.</span>' %}
 {% set ctaText = 'Tell us about your business and which plan you’re thinking about. We’ll reply with the next steps.' %}
 {% set ctaService = 'Websites' %}
 {% set ctaLabel = 'Start my website' %}

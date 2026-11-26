@@ -288,6 +288,7 @@ await step('the portal asks for a sign-in and rejects a wrong password', async (
   await portal.goto(`${SITE}/portal`, { waitUntil: 'networkidle' });
   await portal.locator('[data-view="signin"]').waitFor();
   await shot(portal, 'portal-signin');
+  assert.deepEqual(problems, [], 'the portal page itself should load cleanly');
   await portal.locator('#p-email').fill(MANAGER.email);
   await portal.locator('#p-password').fill('wrong-password');
   await portal.locator('[data-signin-button]').click();
@@ -409,7 +410,18 @@ await step('the menu and message form work at phone size', async () => {
   await shot(mobile, 'mobile-menu');
   await mobile.locator('#site-nav').getByRole('link', { name: 'Printing' }).click();
   await mobile.waitForURL(`${SITE}/printing`);
-  await mobile.locator('.dock [data-quote]').click();
+  // Nothing asking for a quote may stay pinned to the screen while scrolling.
+  const pinned = await mobile.evaluate(() => [...document.querySelectorAll('[data-quote]')]
+    .filter((el) => el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))
+    .filter((el) => {
+      for (let node = el; node && node !== document.body; node = node.parentElement) {
+        if (['fixed', 'sticky'].includes(getComputedStyle(node).position)) return true;
+      }
+      return false;
+    })
+    .map((el) => el.textContent.trim()));
+  assert.deepEqual(pinned, [], 'a quote button is pinned to the phone screen');
+  await mobile.locator('.page-hero [data-quote]').click();
   await mobile.locator('#quote-dialog[open]').waitFor();
   await shot(mobile, 'mobile-form');
   await phone.close();

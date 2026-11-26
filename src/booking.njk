@@ -3,22 +3,24 @@ layout: layouts/base.njk
 permalink: /booking.html
 key: booking
 accent: booking
+backdrop: calendar
 title: Online booking system for local businesses — ready in 7 days | Innovatif
 description: A professional website, booking system, email confirmations and mobile dashboard built to help local businesses turn visitors into customers. Plans from $149/month, ready in 7 days.
 ---
 {% import "ui.njk" as ui %}
 
 <section class="page-hero page-hero--split">
+  <div class="backdrop backdrop--calendar" aria-hidden="true"></div>
   <div class="container">
     <div class="page-hero__text">
-      {{ ui.eyebrow('7-day local booking system', 'star-fill') }}
-      <h1>Get more bookings</h1>
-      <p class="lead">A professional website, booking system, email confirmations and mobile dashboard built to help local businesses turn visitors into customers.</p>
+      {{ ui.eyebrow('7-day local booking system', '📅') }}
+      <h1>Get more <span class="grad">bookings.</span></h1>
+      <p class="lead">A professional website, booking system, email confirmations and mobile dashboard — built to turn visitors into customers.</p>
       <div class="actions">
-        <a class="btn btn--accent" href="/get-started">Get my booking system {{ ui.icon('arrow-right') }}</a>
-        <a class="btn btn--outline" href="#pricing">See pricing</a>
+        <a class="btn btn--accent btn--lg" href="/get-started">Get my booking system</a>
+        {{ ui.more('#pricing', 'See pricing') }}
       </div>
-      <p class="page-hero__note">{{ ui.icon('timer') }}<span>Ready in 7 days — or your first month is free.</span></p>
+      <p class="page-hero__note">Ready in 7 days — or your first month is free.</p>
     </div>
     <div class="page-hero__media">
       {{ ui.img('booking/booking-phone', 'A customer booking an appointment on their phone', '(min-width: 900px) 46vw, 94vw', true) }}
@@ -28,15 +30,15 @@ description: A professional website, booking system, email confirmations and mob
 
 <section class="section" id="problem">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('The problem', 'x-circle') }}
-      <h2>Every extra step costs you customers</h2>
-      <p class="lead">Make it easy for customers to see your services, trust your business and book from their phone — before they choose someone else.</p>
+    <header class="section-head">
+      <p class="eyebrow">The problem</p>
+      <h2>Every extra step <span class="grad">costs you customers.</span></h2>
+      <p class="lead">Make it easy to see your services, trust your business and book from a phone — before they choose someone else.</p>
     </header>
-    <div class="grid grid--3">
+    <div class="grid grid--3 grid--rows-sm">
       {% for item in plans.bookingProblems -%}
       <div class="card card--problem">
-        <span class="card__icon">{{ ui.icon(item.icon) }}</span>
+        {{ ui.emojiTile(item.emoji) }}
         <h3>{{ item.title }}</h3>
         <p>{{ item.text }}</p>
       </div>
@@ -45,11 +47,12 @@ description: A professional website, booking system, email confirmations and mob
   </div>
 </section>
 
-<section class="section section--soft" id="solution">
+<section class="section" id="solution">
+  <div class="backdrop backdrop--calendar" aria-hidden="true"></div>
   <div class="container">
     <header class="section-head">
-      {{ ui.eyebrow('Get more bookings, seriously', 'address-book') }}
-      <h2>The simplest way to get booked</h2>
+      <p class="eyebrow">The fix</p>
+      <h2>The simplest way <span class="grad">to get booked.</span></h2>
       <p class="lead">Everything customers need to trust your business and book faster, all in one simple link.</p>
     </header>
     <div class="gallery">
@@ -62,11 +65,11 @@ description: A professional website, booking system, email confirmations and mob
   </div>
 </section>
 
-<section class="section" id="how">
+<section class="section section--flush-top" id="how">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('How it works — 3 steps', 'lightning') }}
-      <h2>Simple setup. Faster bookings.</h2>
+    <header class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2>Simple setup. <span class="grad">Faster bookings.</span></h2>
     </header>
     <ol class="steps steps--3">
       {% for step in plans.bookingSteps -%}
@@ -76,17 +79,17 @@ description: A professional website, booking system, email confirmations and mob
   </div>
 </section>
 
-<section class="section section--soft" id="included">
+<section class="section section--flush-top" id="included">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('More than you need', 'cursor-click') }}
-      <h2>Everything your business needs to get more bookings</h2>
-      <p class="lead">Give customers a faster, clearer and more professional way to trust your business, take action and book without hesitation.</p>
+    <header class="section-head">
+      <p class="eyebrow">More than you need</p>
+      <h2>Everything it takes to <span class="grad">get booked.</span></h2>
+      <p class="lead">A faster, clearer and more professional way for customers to trust your business and book without hesitation.</p>
     </header>
-    <div class="grid grid--4">
+    <div class="grid grid--3 grid--rows-sm">
       {% for item in plans.bookingIncluded -%}
-      <div class="card">
-        <span class="card__icon">{{ ui.icon(item.icon) }}</span>
+      <div class="card card--compact">
+        {{ ui.emojiTile(item.emoji) }}
         <h3>{{ item.title }}</h3>
         <p>{{ item.text }}</p>
       </div>
@@ -96,32 +99,33 @@ description: A professional website, booking system, email confirmations and mob
 </section>
 
 <section class="section" id="guarantee">
+  <div class="backdrop backdrop--calendar" aria-hidden="true"></div>
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('Launch guarantee', 'sparkle-fill') }}
-      <h2>Ready in 7 days</h2>
-      <p class="lead">Once we receive your business information, your booking system will be ready in 7 days — or your first month is free.</p>
+    <header class="section-head">
+      <p class="eyebrow">Launch guarantee</p>
+      <h2>Ready in <span class="grad">7 days.</span></h2>
+      <p class="lead">Once we have your business information, your booking system is ready in 7 days — or your first month is free.</p>
     </header>
     <div class="trio">
-      <figure><img src="/assets/img/booking/number-one-in-town-1280.webp" srcset="/assets/img/booking/number-one-in-town-640.webp 640w, /assets/img/booking/number-one-in-town-1280.webp 1280w" sizes="(min-width: 700px) 32vw, 94vw" alt="Become number one in town" width="1280" height="720" loading="lazy" decoding="async"></figure>
-      <figure><img src="/assets/img/booking/live-in-7-days-1280.webp" srcset="/assets/img/booking/live-in-7-days-640.webp 640w, /assets/img/booking/live-in-7-days-1280.webp 1280w" sizes="(min-width: 700px) 32vw, 94vw" alt="Live in 7 days" width="1280" height="720" loading="lazy" decoding="async"></figure>
-      <figure><img src="/assets/img/booking/limited-spots-1280.webp" srcset="/assets/img/booking/limited-spots-640.webp 640w, /assets/img/booking/limited-spots-1280.webp 1280w" sizes="(min-width: 700px) 32vw, 94vw" alt="Limited spots" width="1280" height="720" loading="lazy" decoding="async"></figure>
+      <figure><img src="/assets/img/booking/number-one-in-town-1280.webp" srcset="/assets/img/booking/number-one-in-town-640.webp 640w, /assets/img/booking/number-one-in-town-1280.webp 1280w" sizes="(min-width: 720px) 32vw, 94vw" alt="Become number one in town" width="1280" height="720" loading="lazy" decoding="async"></figure>
+      <figure><img src="/assets/img/booking/live-in-7-days-1280.webp" srcset="/assets/img/booking/live-in-7-days-640.webp 640w, /assets/img/booking/live-in-7-days-1280.webp 1280w" sizes="(min-width: 720px) 32vw, 94vw" alt="Live in 7 days" width="1280" height="720" loading="lazy" decoding="async"></figure>
+      <figure><img src="/assets/img/booking/limited-spots-1280.webp" srcset="/assets/img/booking/limited-spots-640.webp 640w, /assets/img/booking/limited-spots-1280.webp 1280w" sizes="(min-width: 720px) 32vw, 94vw" alt="Limited spots" width="1280" height="720" loading="lazy" decoding="async"></figure>
     </div>
-    <div class="callout callout--spaced">
-      {{ ui.icon('lock-simple') }}
+    <div class="callout">
+      {{ ui.emojiTile('🔒') }}
       <div>
-        <strong>Your competitors don’t get this</strong>
+        <strong>Your competitors don’t get this.</strong>
         <p>We only accept one business per category per town. Once your spot is taken, your competitors are locked out.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section section--soft" id="pricing">
+<section class="section section--flush-top" id="pricing">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('Pricing', 'tag') }}
-      <h2>Choose your booking system</h2>
+    <header class="section-head">
+      <p class="eyebrow">Pricing</p>
+      <h2>Choose your <span class="grad">booking system.</span></h2>
       <p class="lead">A one-time setup fee, then a simple monthly plan. Every plan is ready in 7 days.</p>
     </header>
 
@@ -148,7 +152,7 @@ description: A professional website, booking system, email confirmations and mob
       {%- endfor %}
     </div>
 
-    <details class="compare compare--spaced">
+    <details class="compare">
       <summary><span>Compare every feature</span>{{ ui.icon('plus') }}</summary>
       <div class="compare__scroll" tabindex="0" role="region" aria-label="Plan comparison">
         <table>
@@ -177,27 +181,26 @@ description: A professional website, booking system, email confirmations and mob
   </div>
 </section>
 
-<section class="section" id="faq">
+<section class="section section--flush-top" id="faq">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('Get answered', 'question') }}
-      <h2>Frequently asked questions</h2>
-      <p class="lead">Quick answers before you get started.</p>
+    <header class="section-head">
+      <h2>Quick answers <span class="grad">before you start.</span></h2>
     </header>
     {{ ui.faqs(plans.bookingFaqs, true) }}
   </div>
 </section>
 
 <section class="section cta">
+  <div class="backdrop backdrop--calendar" aria-hidden="true"></div>
   <div class="container">
-    <div class="cta__panel">
-      <div class="cta__glow" aria-hidden="true"></div>
-      <h2>Ready to get more bookings?</h2>
+    <div class="cta__inner">
+      <h2>Ready to get <span class="grad">more bookings?</span></h2>
       <p class="lead">Give customers a faster way to book and your business a better way to grow.</p>
       <div class="actions">
-        <a class="btn btn--accent" href="/get-started">Get my booking system {{ ui.icon('arrow-right') }}</a>
-        <button class="btn btn--outline" type="button" data-quote data-service="Booking system">{{ ui.icon('chat-circle-text-fill') }}<span>Ask a question first</span></button>
+        <a class="btn btn--accent btn--lg" href="/get-started">Get my booking system</a>
+        <button class="btn btn--outline btn--lg" type="button" data-quote data-service="Booking system">Ask a question first</button>
       </div>
+      <p class="note">Ready in 7 days — or your first month is free.</p>
     </div>
   </div>
 </section>

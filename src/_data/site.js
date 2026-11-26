@@ -19,6 +19,10 @@ export default {
   address: '', //        street address or service area (optional)
   hours: '', //          e.g. 'Mon–Sat, 9 am – 6 pm' (optional)
 
+  // The small round WhatsApp button that floats in the corner of every page
+  // (it only appears once `whatsapp` above is filled in). Set to false to hide it.
+  whatsappBubble: true,
+
   // Public web address, without a trailing slash, e.g. 'https://www.example.com'.
   // Used for share previews and the sitemap. Optional until the domain is live.
   url: '',

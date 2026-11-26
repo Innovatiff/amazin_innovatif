@@ -3,6 +3,7 @@ layout: layouts/base.njk
 permalink: /software.html
 key: software
 accent: software
+backdrop: lines
 shareImage: software-hero
 title: Custom business software — POS, restaurant ordering, AI receptionist, inventory | Innovatif
 description: Tailored software for business — an advanced POS for 100,000+ products, restaurant ordering systems, AI receptionists, employee management, inventory and fully custom builds. Call or message for pricing.
@@ -10,13 +11,14 @@ description: Tailored software for business — an advanced POS for 100,000+ pro
 {% import "ui.njk" as ui %}
 
 <section class="page-hero">
+  <div class="backdrop backdrop--lines" aria-hidden="true"></div>
   <div class="container">
     <div class="page-hero__text">
-      {{ ui.eyebrow('Tailored software', 'code') }}
-      <h1>Software built around your business</h1>
-      <p class="lead">An advanced POS, restaurant ordering, an AI receptionist, staff and inventory management — or something nobody sells, built exactly for the way you work.</p>
-      {{ ui.contact(site, service='Software', label='Ask for pricing') }}
-      <p class="page-hero__note">{{ ui.icon('tag') }}<span>Every system is priced per project. Call or message us for a clear quote.</span></p>
+      {{ ui.eyebrow('Tailored software', '⚙️') }}
+      <h1>Software built around <span class="grad">your business.</span></h1>
+      <p class="lead">An advanced POS, restaurant ordering, an AI receptionist, staff and inventory — or something nobody sells, built exactly for the way you work.</p>
+      {{ ui.contact(site, service='Software', label='Ask for pricing', size='lg') }}
+      <p class="page-hero__note">Every system is priced per project. Call or message us for a clear quote.</p>
     </div>
     <div class="page-hero__media">
       {{ ui.wide('software-hero', 'Business software running on a point-of-sale terminal, tablet, laptop and phone') }}
@@ -24,7 +26,7 @@ description: Tailored software for business — an advanced POS for 100,000+ pro
   </div>
 </section>
 
-<section class="section section--tight" id="systems">
+<section class="section--systems" id="systems">
   <div class="container">
     {% for item in software.flagship %}
     <article class="feature" id="{{ item.id }}">
@@ -33,7 +35,7 @@ description: Tailored software for business — an advanced POS for 100,000+ pro
         <span class="feature__badge">{{ item.badge }}</span>
       </div>
       <div class="feature__text">
-        {{ ui.eyebrow(item.short, item.icon) }}
+        {{ ui.eyebrow(item.kicker, item.emoji) }}
         <h2>{{ item.name }}</h2>
         <p class="feature__lead">{{ item.lead }}</p>
         <p>{{ item.text }}</p>
@@ -42,28 +44,29 @@ description: Tailored software for business — an advanced POS for 100,000+ pro
           <li>{{ ui.icon('check') }}<span>{{ point }}</span></li>
           {%- endfor %}
         </ul>
-        {{ ui.contact(site, service='Software', product=item.name, label='Ask for pricing', size='sm') }}
+        {{ ui.contact(site, service='Software', product=item.name, label='Ask for pricing') }}
       </div>
     </article>
     {% endfor %}
   </div>
 </section>
 
-<section class="section section--soft" id="more">
+<section class="section" id="more">
+  <div class="backdrop backdrop--lines" aria-hidden="true"></div>
   <div class="container">
     <header class="section-head">
-      {{ ui.eyebrow('More we build', 'squares-four') }}
-      <h2>Whatever your business runs on</h2>
-      <p class="lead">These are the systems we’re asked for most. Each one is adapted to your business, your branding and the tools you already use.</p>
+      <p class="eyebrow">More we build</p>
+      <h2>Whatever your business <span class="grad">runs on.</span></h2>
+      <p class="lead">The systems we’re asked for most. Each one is adapted to your business, your branding and the tools you already use.</p>
     </header>
-    <div class="grid grid--3">
+    <div class="grid grid--3 grid--tiles-sm">
       {% for item in software.more -%}
       <article class="shot" id="{{ item.id }}">
         <div class="shot__media">{{ ui.img('software/' + item.id, item.name) }}</div>
         <div class="shot__body">
-          <h3>{{ ui.icon(item.icon) }}{{ item.name }}</h3>
+          <h3>{{ ui.emoji(item.emoji) }}<span>{{ item.name }}</span></h3>
           <p>{{ item.text }}</p>
-          <button class="link-button" type="button" data-quote data-service="Software" data-product="{{ item.name }}">Ask for pricing {{ ui.icon('arrow-right') }}</button>
+          <button class="more" type="button" data-quote data-service="Software" data-product="{{ item.name }}">Ask for pricing{{ ui.icon('caret-right') }}</button>
         </div>
       </article>
       {%- endfor %}
@@ -71,31 +74,31 @@ description: Tailored software for business — an advanced POS for 100,000+ pro
   </div>
 </section>
 
-<section class="section" id="also">
-  <div class="container split">
-    <div class="split__text">
-      {{ ui.eyebrow('And much more', 'plus') }}
-      <h2>If you can describe it, we can build it</h2>
+<section class="section section--flush-top" id="also">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">And much more</p>
+      <h2>If you can describe it, <span class="grad">we can build it.</span></h2>
       <p class="lead">Not on the list? That’s usually the point. Tell us the problem and we’ll design the simplest system that solves it.</p>
-      <ul class="chips chips--lg">
-        {% for item in software.also %}<li>{{ item }}</li>{% endfor %}
-      </ul>
-    </div>
-    <div class="split__text">
-      <div class="split__media">{{ ui.img('software/custom-software', 'A developer’s desk with code and a custom business app on screen', '(min-width: 900px) 46vw, 94vw') }}</div>
+    </header>
+    <ul class="chips chips--center">
+      {% for item in software.also %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+    <div class="also">
       <h3>Industries we build for</h3>
-      <ul class="chips chips--lg">
-        {% for item in software.industries %}<li>{{ item }}</li>{% endfor %}
+      <ul class="names">
+        {% for item in software.industries %}<li>{{ item }}</li>
+        {% endfor %}
       </ul>
     </div>
   </div>
 </section>
 
-<section class="section section--soft" id="process">
+<section class="section section--flush-top" id="process">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('How we work', 'lightning') }}
-      <h2>No jargon. No surprises.</h2>
+    <header class="section-head">
+      <p class="eyebrow">How we work</p>
+      <h2>No jargon. <span class="grad">No surprises.</span></h2>
     </header>
     <ol class="steps steps--4">
       {% for step in software.steps -%}
@@ -105,17 +108,16 @@ description: Tailored software for business — an advanced POS for 100,000+ pro
   </div>
 </section>
 
-<section class="section" id="faq">
+<section class="section section--flush-top" id="faq">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('Questions', 'question') }}
-      <h2>Software questions, answered</h2>
+    <header class="section-head">
+      <h2>Software questions, <span class="grad">answered.</span></h2>
     </header>
     {{ ui.faqs(software.faqs, true) }}
   </div>
 </section>
 
-{% set ctaTitle = 'Tell us what you need it to do' %}
+{% set ctaTitle = 'Tell us what you need <span class="grad">it to do.</span>' %}
 {% set ctaText = 'Describe the problem in your own words. We’ll come back with ideas, a timeline and a clear price.' %}
 {% set ctaService = 'Software' %}
 {% set ctaLabel = 'Ask for pricing' %}
