@@ -402,11 +402,17 @@ await step('the menu and message form work at phone size', async () => {
   const mobile = await phone.newPage();
   await mobile.goto(SITE, { waitUntil: 'networkidle' });
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, 'page scrolls sideways');
-  await mobile.locator('[data-nav-toggle]').click();
+  // People open the menu halfway down a page, so test it there — with a real
+  // tap, because a scripted click would scroll the page itself first.
+  await mobile.evaluate(() => window.scrollTo({ top: 1500, behavior: 'instant' }));
+  const toggle = await mobile.locator('[data-nav-toggle]').boundingBox();
+  await mobile.touchscreen.tap(toggle.x + toggle.width / 2, toggle.y + toggle.height / 2);
   await mobile.locator('#site-nav.is-open').getByRole('link', { name: 'Contact' }).waitFor();
   await mobile.waitForTimeout(400); // let the menu finish sliding in
   const menu = await mobile.locator('#site-nav').boundingBox();
-  assert.ok(menu.height > 700 && menu.width === 390, `menu should fill the screen, got ${menu.width}×${menu.height}`);
+  assert.ok(menu.y >= 0 && menu.y < 80 && menu.height > 700 && menu.width === 390,
+    `menu should fill the screen, got ${menu.width}×${menu.height} at ${menu.y}px from the top`);
+  assert.equal(await mobile.evaluate(() => Math.round(window.scrollY)), 1500, 'opening the menu moved the page');
   await shot(mobile, 'mobile-menu');
   await mobile.locator('#site-nav').getByRole('link', { name: 'Printing' }).click();
   await mobile.waitForURL(`${SITE}/printing`);
