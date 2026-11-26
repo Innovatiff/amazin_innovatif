@@ -58,17 +58,24 @@ function validate(form) {
   return { values, firstError: Object.keys(errors)[0] };
 }
 
-// A light brake on accidental double-sends and scripted floods from one browser.
-function tooMany() {
+// A light brake on accidental double-sends and scripted floods from one
+// browser: at most five messages an hour. Only messages that were really
+// sent are counted, so a failed attempt never locks anyone out.
+function recentlySent() {
   try {
     const hourAgo = Date.now() - 60 * 60 * 1000;
-    const sent = JSON.parse(localStorage.getItem('innovatif:sent') || '[]').filter((time) => time > hourAgo);
-    if (sent.length >= 5) return true;
-    localStorage.setItem('innovatif:sent', JSON.stringify([...sent, Date.now()]));
+    return JSON.parse(localStorage.getItem('innovatif:sent') || '[]').filter((time) => time > hourAgo);
   } catch {
-    // Private browsing without storage: nothing to count, let it through.
+    return []; // private browsing without storage: nothing to count
   }
-  return false;
+}
+
+function rememberSent() {
+  try {
+    localStorage.setItem('innovatif:sent', JSON.stringify([...recentlySent(), Date.now()]));
+  } catch {
+    // nothing to remember without storage
+  }
 }
 
 function showDone(form, name) {
@@ -111,7 +118,7 @@ export async function submitLead(form) {
     return;
   }
 
-  if (tooMany()) {
+  if (recentlySent().length >= 5) {
     status.textContent = 'You’ve sent a few messages already — we’ll reply soon. For anything urgent, please call us.';
     status.hidden = false;
     return;
@@ -126,6 +133,7 @@ export async function submitLead(form) {
       status: 'New',
       source: 'Website',
     });
+    rememberSent();
     showDone(form, values.name);
   } finally {
     label.textContent = original;

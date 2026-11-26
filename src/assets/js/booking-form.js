@@ -97,7 +97,7 @@ async function submit() {
   next.disabled = true;
   nextLabel.textContent = 'Sending…';
   try {
-    if (data.reservationChoice === 'Reserve my spot') {
+    if (data.reservationChoice === 'Reserve my spot' && SITE.depositLink) {
       // Save the lead first, so it is never lost if the payment is abandoned.
       const saved = await save('Bookings', {
         ...data,

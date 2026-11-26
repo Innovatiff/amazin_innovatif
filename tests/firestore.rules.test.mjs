@@ -198,6 +198,19 @@ describe('managers', () => {
     await assertFails(updateDoc(doc(manager, 'Bookings/b1'), { plan: 'Elite' }));
   });
 
+  test('can annotate older records with an unknown or missing status', async () => {
+    await env.withSecurityRulesDisabled(async (admin) => {
+      const db = admin.firestore();
+      const { status, ...withoutStatus } = message();
+      await setDoc(doc(db, 'Contact/old1'), { ...message(), status: 'Contacted', createdAt: Timestamp.now() });
+      await setDoc(doc(db, 'Contact/old2'), { ...withoutStatus, createdAt: Timestamp.now() });
+    });
+    await assertSucceeds(updateDoc(doc(manager, 'Contact/old1'), { notes: 'From the old system.' }));
+    await assertSucceeds(updateDoc(doc(manager, 'Contact/old2'), { readAt: serverTimestamp() }));
+    await assertSucceeds(updateDoc(doc(manager, 'Contact/old2'), { status: 'Done' }));
+    await assertFails(updateDoc(doc(manager, 'Contact/old1'), { status: 'Pending Payment' }));
+  });
+
   test('cannot set a status that does not exist', async () => {
     await assertFails(updateDoc(doc(manager, 'Contact/m1'), { status: 'Whatever' }));
     await assertFails(updateDoc(doc(manager, 'Contact/m1'), { notes: 'x'.repeat(4001) }));

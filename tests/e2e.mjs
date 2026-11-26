@@ -183,6 +183,17 @@ await step('a visitor’s message is saved to Firestore', async () => {
   assert.ok(saved.createdAt instanceof Date && Date.now() - saved.createdAt.getTime() < 60000);
 });
 
+await step('opening the form again after sending starts a fresh message', async () => {
+  await page.locator('#quote-dialog [data-dialog-close]').click();
+  await page.locator('#flyers [data-quote]').click();
+  await page.locator('#quote-dialog[open] #q-name').waitFor();
+  assert.equal(await page.locator('#q-name').inputValue(), '');
+  assert.equal(await page.locator('#q-product').inputValue(), 'Flyers');
+  assert.equal(await page.locator('#quote-dialog [data-form-done]').isVisible(), false);
+  await page.keyboard.press('Escape');
+  await page.locator('#quote-dialog').waitFor({ state: 'hidden' });
+});
+
 await step('the contact page form works with only an email address', async () => {
   await page.goto(`${SITE}/contact`, { waitUntil: 'networkidle' });
   await page.locator('#c-name').fill('Sam Carter');

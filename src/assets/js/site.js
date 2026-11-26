@@ -41,6 +41,13 @@ const dialog = $('#quote-dialog');
 function openQuote({ service = '', product = '' } = {}) {
   if (!dialog) return;
   const form = $('[data-lead-form]', dialog);
+  const done = $('[data-form-done]', form);
+  if (!done.hidden) {
+    // A message was already sent from this pop-up: start a fresh one.
+    form.reset();
+    done.hidden = true;
+    $('.lead-form__fields', form).hidden = false;
+  }
   if (service && form.elements.enquiry) form.elements.enquiry.value = service;
   if (product && form.elements.product) form.elements.product.value = product;
   form.dataset.openedAt = String(Date.now());

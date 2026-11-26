@@ -51,8 +51,9 @@ service cloud.firestore {
     // fields only. The visitor's own words can never be edited afterwards.
     function managerEdit() {
       let after = request.resource.data;
-      return after.diff(resource.data).affectedKeys().hasOnly(['status', 'notes', 'readAt', 'updatedAt', 'handledBy'])
-        && after.status in ['New', 'In progress', 'Done', 'Archived', 'Pending Payment', 'Paid - New Booking']
+      let changed = after.diff(resource.data).affectedKeys();
+      return changed.hasOnly(['status', 'notes', 'readAt', 'updatedAt', 'handledBy'])
+        && (!changed.hasAny(['status']) || after.status in ['New', 'In progress', 'Done', 'Archived'])
         && optionalText(after, 'notes', 4000)
         && optionalText(after, 'handledBy', 200);
     }

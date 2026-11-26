@@ -132,7 +132,7 @@ This needs Java installed.
 npm test
 ```
 
-Runs 22 checks on the security rules (visitors can only send, strangers see
+Runs 23 checks on the security rules (visitors can only send, strangers see
 nothing, managers can only change status and notes).
 
 ```bash
