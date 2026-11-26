@@ -1,0 +1,203 @@
+---
+layout: layouts/base.njk
+permalink: /booking.html
+key: booking
+accent: booking
+title: Online booking system for local businesses — ready in 7 days | Innovatif
+description: A professional website, booking system, email confirmations and mobile dashboard built to help local businesses turn visitors into customers. Plans from $149/month, ready in 7 days.
+---
+{% import "ui.njk" as ui %}
+
+<section class="page-hero page-hero--split">
+  <div class="container">
+    <div class="page-hero__text">
+      {{ ui.eyebrow('7-day local booking system', 'star-fill') }}
+      <h1>Get more bookings</h1>
+      <p class="lead">A professional website, booking system, email confirmations and mobile dashboard built to help local businesses turn visitors into customers.</p>
+      <div class="actions">
+        <a class="btn btn--accent" href="/get-started">Get my booking system {{ ui.icon('arrow-right') }}</a>
+        <a class="btn btn--outline" href="#pricing">See pricing</a>
+      </div>
+      <p class="page-hero__note">{{ ui.icon('timer') }}<span>Ready in 7 days — or your first month is free.</span></p>
+    </div>
+    <div class="page-hero__media">
+      {{ ui.img('booking/booking-phone', 'A customer booking an appointment on their phone', '(min-width: 900px) 46vw, 94vw', true) }}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="problem">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('The problem', 'x-circle') }}
+      <h2>Every extra step costs you customers</h2>
+      <p class="lead">Make it easy for customers to see your services, trust your business and book from their phone — before they choose someone else.</p>
+    </header>
+    <div class="grid grid--3">
+      {% for item in plans.bookingProblems -%}
+      <div class="card card--problem">
+        <span class="card__icon">{{ ui.icon(item.icon) }}</span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.text }}</p>
+      </div>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft" id="solution">
+  <div class="container">
+    <header class="section-head">
+      {{ ui.eyebrow('Get more bookings, seriously', 'address-book') }}
+      <h2>The simplest way to get booked</h2>
+      <p class="lead">Everything customers need to trust your business and book faster, all in one simple link.</p>
+    </header>
+    <div class="gallery">
+      <figure>{{ ui.img('booking/dashboard', 'A bookings dashboard showing today’s appointments', '(min-width: 760px) 48vw, 94vw') }}<figcaption>Business dashboard</figcaption></figure>
+      <figure>{{ ui.img('booking/confirmation', 'A booking confirmation email on a phone and a new booking alert on a watch', '(min-width: 760px) 48vw, 46vw') }}<figcaption>Confirmations &amp; alerts</figcaption></figure>
+      <figure>{{ ui.img('booking/mobile-stats', 'A mobile stats page showing bookings and revenue', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Mobile stats page</figcaption></figure>
+      <figure>{{ ui.img('booking/qr-code', 'A customer scanning a “scan to book” QR code at a salon counter', '(min-width: 760px) 32vw, 46vw') }}<figcaption>QR code booking link</figcaption></figure>
+      <figure>{{ ui.img('booking/reviews', 'A review request screen with five stars', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Review requests</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('How it works — 3 steps', 'lightning') }}
+      <h2>Simple setup. Faster bookings.</h2>
+    </header>
+    <ol class="steps steps--3">
+      {% for step in plans.bookingSteps -%}
+      <li class="step"><div class="step__body"><h3>{{ step.title }}</h3><p>{{ step.text }}</p></div></li>
+      {%- endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section section--soft" id="included">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('More than you need', 'cursor-click') }}
+      <h2>Everything your business needs to get more bookings</h2>
+      <p class="lead">Give customers a faster, clearer and more professional way to trust your business, take action and book without hesitation.</p>
+    </header>
+    <div class="grid grid--4">
+      {% for item in plans.bookingIncluded -%}
+      <div class="card">
+        <span class="card__icon">{{ ui.icon(item.icon) }}</span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.text }}</p>
+      </div>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="guarantee">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Launch guarantee', 'sparkle-fill') }}
+      <h2>Ready in 7 days</h2>
+      <p class="lead">Once we receive your business information, your booking system will be ready in 7 days — or your first month is free.</p>
+    </header>
+    <div class="trio">
+      <figure><img src="/assets/img/booking/number-one-in-town-1280.webp" srcset="/assets/img/booking/number-one-in-town-640.webp 640w, /assets/img/booking/number-one-in-town-1280.webp 1280w" sizes="(min-width: 700px) 32vw, 94vw" alt="Become number one in town" width="1280" height="720" loading="lazy" decoding="async"></figure>
+      <figure><img src="/assets/img/booking/live-in-7-days-1280.webp" srcset="/assets/img/booking/live-in-7-days-640.webp 640w, /assets/img/booking/live-in-7-days-1280.webp 1280w" sizes="(min-width: 700px) 32vw, 94vw" alt="Live in 7 days" width="1280" height="720" loading="lazy" decoding="async"></figure>
+      <figure><img src="/assets/img/booking/limited-spots-1280.webp" srcset="/assets/img/booking/limited-spots-640.webp 640w, /assets/img/booking/limited-spots-1280.webp 1280w" sizes="(min-width: 700px) 32vw, 94vw" alt="Limited spots" width="1280" height="720" loading="lazy" decoding="async"></figure>
+    </div>
+    <div class="callout callout--spaced">
+      {{ ui.icon('lock-simple') }}
+      <div>
+        <strong>Your competitors don’t get this</strong>
+        <p>We only accept one business per category per town. Once your spot is taken, your competitors are locked out.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft" id="pricing">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Pricing', 'tag') }}
+      <h2>Choose your booking system</h2>
+      <p class="lead">A one-time setup fee, then a simple monthly plan. Every plan is ready in 7 days.</p>
+    </header>
+
+    <div class="plans plans--3">
+      {% for plan in plans.booking -%}
+      <article class="plan{% if plan.best %} plan--best{% endif %}">
+        {% if plan.best %}<span class="plan__flag">{{ ui.icon('star-fill') }}Recommended</span>{% endif %}
+        <header class="plan__head">
+          <h3>{{ plan.name }}</h3>
+          <p>{{ plan.tagline }}</p>
+        </header>
+        <div class="plan__price">
+          <p class="plan__amount"><strong>{{ plan.price }}</strong><span>{{ plan.period }}</span></p>
+          <p class="plan__meta"><span>{{ ui.icon('wrench') }}{{ plan.setup }} setup fee</span><span>{{ ui.icon('timer') }}Ready in 7 days</span></p>
+        </div>
+        <ul class="plan__features">
+          {% for feature in plan.features -%}
+          <li>{{ ui.icon('check') }}<span>{{ feature }}</span></li>
+          {%- endfor %}
+          <li class="plan__best-for"><strong>Best for:</strong> {{ plan.bestFor }}</li>
+        </ul>
+        <a class="btn {% if plan.best %}btn--accent{% else %}btn--outline{% endif %} btn--block" href="/get-started?plan={{ plan.name }}">Get started</a>
+      </article>
+      {%- endfor %}
+    </div>
+
+    <details class="compare compare--spaced">
+      <summary><span>Compare every feature</span>{{ ui.icon('plus') }}</summary>
+      <div class="compare__scroll" tabindex="0" role="region" aria-label="Plan comparison">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Feature</th>
+              {% for plan in plans.booking %}<th scope="col">{{ plan.name }}<small>{{ plan.price }}{{ plan.period }}</small></th>{% endfor %}
+            </tr>
+          </thead>
+          {% for group in plans.bookingCompare -%}
+          <tbody>
+            <tr><th scope="rowgroup" colspan="4">{{ group.group }}</th></tr>
+            {% for row in group.rows -%}
+            <tr>
+              <td>{{ row[0] }}</td>
+              <td>{{ ui.cell(row[1]) }}</td>
+              <td>{{ ui.cell(row[2]) }}</td>
+              <td>{{ ui.cell(row[3]) }}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+          {%- endfor %}
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Get answered', 'question') }}
+      <h2>Frequently asked questions</h2>
+      <p class="lead">Quick answers before you get started.</p>
+    </header>
+    {{ ui.faqs(plans.bookingFaqs, true) }}
+  </div>
+</section>
+
+<section class="section cta">
+  <div class="container">
+    <div class="cta__panel">
+      <div class="cta__glow" aria-hidden="true"></div>
+      <h2>Ready to get more bookings?</h2>
+      <p class="lead">Give customers a faster way to book and your business a better way to grow.</p>
+      <div class="actions">
+        <a class="btn btn--accent" href="/get-started">Get my booking system {{ ui.icon('arrow-right') }}</a>
+        <button class="btn btn--outline" type="button" data-quote data-service="Booking system">{{ ui.icon('chat-circle-text-fill') }}<span>Ask a question first</span></button>
+      </div>
+    </div>
+  </div>
+</section>

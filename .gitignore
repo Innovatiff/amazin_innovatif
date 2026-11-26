@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Built site (created by `npm run build`, deployed by `npm run deploy`)
+public/
+
+# Firebase
+.firebase/
+*-debug.log
+firebase-export-*/
+
+# Local files
+.DS_Store
+.env
+.env.*

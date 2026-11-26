@@ -1,0 +1,35 @@
+---
+layout: layouts/base.njk
+permalink: /404.html
+key: not-found
+accent: neutral
+noindex: true
+title: Page not found — Innovatif
+description: That page doesn’t exist. Here’s where to go next.
+---
+{% import "ui.njk" as ui %}
+
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero__text">
+      {{ ui.eyebrow('Error 404', 'warning-circle') }}
+      <h1>We couldn’t find that page</h1>
+      <p class="lead">It may have moved when we rebuilt the site. Everything we do is one click from here.</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="/">Go to the home page</a>
+        <button class="btn btn--outline" type="button" data-quote>{{ ui.icon('chat-circle-text-fill') }}<span>Send a message</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="container">
+    <div class="grid grid--4">
+      <a class="card card--link" data-accent="print" href="/printing"><span class="card__icon">{{ ui.icon('printer') }}</span><h2>Printing</h2><p>Cards, banners, shirts, stickers, signs and packaging.</p></a>
+      <a class="card card--link" data-accent="web" href="/websites"><span class="card__icon">{{ ui.icon('browser') }}</span><h2>Websites</h2><p>Two simple plans, live in days.</p></a>
+      <a class="card card--link" data-accent="booking" href="/booking"><span class="card__icon">{{ ui.icon('calendar-check') }}</span><h2>Booking system</h2><p>Turn visitors into booked appointments.</p></a>
+      <a class="card card--link" data-accent="software" href="/software"><span class="card__icon">{{ ui.icon('code') }}</span><h2>Software</h2><p>POS, ordering, AI receptionist and custom builds.</p></a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,91 @@
+---
+layout: layouts/base.njk
+permalink: /contact.html
+key: contact
+accent: neutral
+title: Contact Innovatif — call, WhatsApp or send a message
+description: Get a quote for printing, a website, a booking system or custom software. Call, WhatsApp or send Innovatif a message and we’ll get back to you.
+---
+{% import "ui.njk" as ui %}
+
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero__text">
+      {{ ui.eyebrow('Contact', 'chat-circle-text') }}
+      <h1>How can we help?</h1>
+      <p class="lead">Tell us what you need — a print job, a website, a booking system or software — and we’ll come back with answers and a clear quote.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="container contact-grid">
+    <div class="contact-methods">
+      {% if site.phone -%}
+      <a class="method" href="{{ site.phone | tel }}">
+        <span class="card__icon">{{ ui.icon('phone-fill') }}</span>
+        <span><strong>Call us</strong><span>{{ site.phoneDisplay or site.phone }}</span></span>
+        {{ ui.icon('arrow-up-right') }}
+      </a>
+      {%- endif %}
+      {% if site.whatsapp -%}
+      <a class="method method--whatsapp" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about your services.') }}" target="_blank" rel="noopener">
+        <span class="card__icon">{{ ui.icon('whatsapp-logo-fill') }}</span>
+        <span><strong>WhatsApp</strong><span>Send photos, files and voice notes</span></span>
+        {{ ui.icon('arrow-up-right') }}
+      </a>
+      {%- endif %}
+      <a class="method" href="#message">
+        <span class="card__icon">{{ ui.icon('chat-circle-text-fill') }}</span>
+        <span><strong>Send a message</strong><span>Use the form and we’ll reply the way you prefer</span></span>
+        {{ ui.icon('arrow-right') }}
+      </a>
+      {% if site.email -%}
+      <a class="method" href="mailto:{{ site.email }}">
+        <span class="card__icon">{{ ui.icon('envelope-simple') }}</span>
+        <span><strong>Email</strong><span>{{ site.email }}</span></span>
+        {{ ui.icon('arrow-up-right') }}
+      </a>
+      {%- endif %}
+      {% if site.address -%}
+      <div class="method method--static">
+        <span class="card__icon">{{ ui.icon('map-pin') }}</span>
+        <span><strong>Find us</strong><span>{{ site.address }}</span></span>
+      </div>
+      {%- endif %}
+      {% if site.hours -%}
+      <div class="method method--static">
+        <span class="card__icon">{{ ui.icon('clock') }}</span>
+        <span><strong>Opening hours</strong><span>{{ site.hours }}</span></span>
+      </div>
+      {%- endif %}
+      <a class="method" href="/get-started" data-accent="booking">
+        <span class="card__icon">{{ ui.icon('calendar-check') }}</span>
+        <span><strong>Starting a booking system?</strong><span>Answer a few questions and reserve your spot</span></span>
+        {{ ui.icon('arrow-right') }}
+      </a>
+      <figure>{{ ui.img('general/chat-support', 'A customer chatting with Innovatif about a print quote', '(min-width: 900px) 40vw, 94vw') }}</figure>
+    </div>
+
+    <div class="panel" id="message">
+      <h2>Send us a message</h2>
+      <p>The more you tell us, the more accurate our first reply will be.</p>
+      {% set formId = 'c' %}
+      {% include "partials/lead-form.njk" %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('What happens next', 'lightning') }}
+      <h2>From message to quote</h2>
+    </header>
+    <ol class="steps steps--3">
+      <li class="step"><div class="step__body"><h3>We read it properly</h3><p>Your message goes straight to our team — not into a queue of auto-replies.</p></div></li>
+      <li class="step"><div class="step__body"><h3>We reply your way</h3><p>By call, WhatsApp or email — whichever you picked — with any questions we need answered.</p></div></li>
+      <li class="step"><div class="step__body"><h3>You get a clear quote</h3><p>A price and a timeline in plain language, with no obligation to go ahead.</p></div></li>
+    </ol>
+  </div>
+</section>

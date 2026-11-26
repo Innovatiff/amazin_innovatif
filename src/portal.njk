@@ -1,0 +1,134 @@
+---
+permalink: /portal.html
+eleventyExcludeFromCollections: true
+---
+{% import "ui.njk" as ui %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manager portal — {{ site.name }}</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="color-scheme" content="dark">
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | bust }}">
+    <link rel="stylesheet" href="{{ '/assets/css/portal.css' | bust }}">
+    <script type="module" src="{{ '/assets/js/portal.js' | bust }}"></script>
+  </head>
+  <body class="portal" data-accent="neutral" data-page="portal">
+    {# ── Checking who is signed in ─────────────────────────────────────── #}
+    <div class="portal-center" data-view="loading">
+      <span class="spinner" role="status"><span class="sr-only">Loading</span></span>
+      <noscript><p>The manager portal needs JavaScript turned on.</p></noscript>
+    </div>
+
+    {# ── Sign in ───────────────────────────────────────────────────────── #}
+    <main class="portal-center" data-view="signin" hidden>
+      <form class="auth" data-signin novalidate>
+        <a class="brand" href="/" aria-label="{{ site.name }} — back to the website">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__name">{{ site.name }}</span>
+        </a>
+        <div>
+          <h1>Manager portal</h1>
+          <p>Sign in to read website messages and booking leads.</p>
+        </div>
+        <div class="field">
+          <label for="p-email">Email</label>
+          <input id="p-email" name="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="p-password">Password</label>
+          <input id="p-password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <p class="form-status" role="alert" data-auth-error hidden></p>
+        <p class="form-status form-status--ok" role="status" data-auth-info hidden></p>
+        <button class="btn btn--primary btn--block" type="submit" data-signin-button>Sign in</button>
+        <button class="link-button" type="button" data-reset>Forgot your password?</button>
+      </form>
+      <a class="portal-back" href="/">{{ ui.icon('arrow-left') }} Back to the website</a>
+    </main>
+
+    {# ── Signed in, but not on the managers list ───────────────────────── #}
+    <main class="portal-center" data-view="denied" hidden>
+      <div class="auth">
+        <span class="card__icon">{{ ui.icon('lock-simple') }}</span>
+        <div>
+          <h1>Almost there</h1>
+          <p>You’re signed in as <strong data-denied-email></strong>, but this account hasn’t been added to the managers list yet.</p>
+        </div>
+        <div class="uid">
+          <span>Your account ID</span>
+          <code data-denied-uid></code>
+          <button class="btn btn--outline btn--sm" type="button" data-copy-uid>{{ ui.icon('copy') }}<span>Copy ID</span></button>
+        </div>
+        <p class="auth__hint">The owner adds this ID in the Firebase console: Firestore → <code>managers</code> collection → new document with this ID. Then press “Try again”.</p>
+        <div class="actions">
+          <button class="btn btn--primary" type="button" data-retry>Try again</button>
+          <button class="btn btn--outline" type="button" data-signout>Sign out</button>
+        </div>
+      </div>
+    </main>
+
+    {# ── The inbox ─────────────────────────────────────────────────────── #}
+    <div class="app" data-view="app" hidden>
+      <header class="app__bar">
+        <a class="brand" href="/" aria-label="{{ site.name }} — open the website">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__name">{{ site.name }}</span>
+        </a>
+        <div class="tabs" role="tablist" aria-label="Inbox">
+          <button class="tab" type="button" role="tab" aria-selected="true" data-tab="Contact">{{ ui.icon('tray') }}<span>Messages</span><b data-count="Contact" hidden></b></button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="Bookings">{{ ui.icon('calendar-check') }}<span>Booking leads</span><b data-count="Bookings" hidden></b></button>
+        </div>
+        <div class="app__user">
+          <button class="icon-button" type="button" data-alerts aria-pressed="false" title="Sound and desktop alerts for new messages">{{ ui.icon('bell') }}<span class="sr-only">Alerts for new messages</span></button>
+          <span class="app__email" data-user-email></span>
+          <button class="btn btn--outline btn--sm" type="button" data-signout>{{ ui.icon('sign-out') }}<span>Sign out</span></button>
+        </div>
+      </header>
+
+      <div class="app__body">
+        <section class="pane pane--list" aria-label="Items">
+          <div class="toolbar">
+            <label class="search">
+              {{ ui.icon('magnifying-glass') }}
+              <span class="sr-only">Search</span>
+              <input type="search" placeholder="Search name, phone, email or text" data-search>
+            </label>
+            <div class="filters" role="group" aria-label="Filter by status">
+              <button class="filter is-active" type="button" data-filter="open">Open <b data-stat="open">0</b></button>
+              <button class="filter" type="button" data-filter="new">New <b data-stat="new">0</b></button>
+              <button class="filter" type="button" data-filter="progress">In progress <b data-stat="progress">0</b></button>
+              <button class="filter" type="button" data-filter="done">Done <b data-stat="done">0</b></button>
+              <button class="filter" type="button" data-filter="archived">Archived <b data-stat="archived">0</b></button>
+              <button class="filter" type="button" data-filter="all">All <b data-stat="all">0</b></button>
+            </div>
+          </div>
+          <p class="form-status" role="alert" data-app-error hidden></p>
+          <ul class="list" data-list></ul>
+          <div class="list__foot">
+            <button class="btn btn--outline btn--sm" type="button" data-more hidden>Load older</button>
+            <button class="btn btn--outline btn--sm" type="button" data-export>{{ ui.icon('download-simple') }}<span>Export this list (CSV)</span></button>
+          </div>
+        </section>
+
+        <section class="pane pane--detail" aria-label="Details" data-detail>
+          <div class="empty" data-empty>
+            {{ ui.icon('tray') }}
+            <p>Select a message to read it.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="toast" role="status" data-toast hidden></div>
+    </div>
+
+    {# Icon sprite address for the script, so its icons match the site's. #}
+    <span data-icons="{{ '/assets/icons.svg' | bust }}" hidden></span>
+  </body>
+</html>

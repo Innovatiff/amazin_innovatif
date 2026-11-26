@@ -1,0 +1,129 @@
+rules_version = '2';
+
+// Security rules for the Innovatif website.
+//
+//   • Anyone visiting the site may SEND a message or booking request, but only
+//     in the exact shape the forms produce — nothing else can be written.
+//   • Only managers may READ, update or delete them (the manager portal).
+//   • A manager is an account whose user ID has a document in "managers".
+//     Those documents can only be created by the project owner in the
+//     Firebase console; nothing on the website can add one.
+//
+// After changing this file run `npm test`, then `npm run deploy`.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isManager() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/managers/$(request.auth.uid));
+    }
+
+    function isText(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
+
+    // A field that may be left out; when present it must be short text.
+    function optionalText(data, key, max) {
+      return !(key in data) || (data[key] is string && data[key].size() <= max);
+    }
+
+    // True when the list has no item at this position, or the item is short text.
+    function textAt(items, index) {
+      return items.size() <= index || (items[index] is string && items[index].size() <= 120);
+    }
+
+    // A field that may be left out; when present it must be a list of at most
+    // twelve short pieces of text (rules cannot loop, so each slot is checked).
+    function optionalTextList(data, key) {
+      return !(key in data)
+        || (data[key] is list && data[key].size() <= 12
+          && textAt(data[key], 0) && textAt(data[key], 1) && textAt(data[key], 2) && textAt(data[key], 3)
+          && textAt(data[key], 4) && textAt(data[key], 5) && textAt(data[key], 6) && textAt(data[key], 7)
+          && textAt(data[key], 8) && textAt(data[key], 9) && textAt(data[key], 10) && textAt(data[key], 11));
+    }
+
+    function hasText(data, key) {
+      return key in data && data[key] is string && data[key].size() > 0;
+    }
+
+    // What a manager is allowed to change on a message or lead: its workflow
+    // fields only. The visitor's own words can never be edited afterwards.
+    function managerEdit() {
+      let after = request.resource.data;
+      let changed = after.diff(resource.data).affectedKeys();
+      return changed.hasOnly(['status', 'notes', 'readAt', 'updatedAt', 'handledBy'])
+        && (!changed.hasAny(['status']) || after.status in ['New', 'In progress', 'Done', 'Archived'])
+        && optionalText(after, 'notes', 4000)
+        && optionalText(after, 'handledBy', 200);
+    }
+
+    // ── Managers ──────────────────────────────────────────────────────────
+    match /managers/{userId} {
+      // Each account may check whether it is on the list; nothing more.
+      allow get: if request.auth != null && request.auth.uid == userId;
+      allow list, create, update, delete: if false;
+    }
+
+    // ── Website messages (the message form on every page) ────────────────
+    match /Contact/{messageId} {
+      function validMessage() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['name', 'email', 'phone', 'enquiry', 'product', 'message', 'preferredContact', 'page', 'status', 'source', 'createdAt'])
+          && data.keys().hasAll(['name', 'enquiry', 'message', 'status', 'source', 'createdAt'])
+          && isText(data.name, 1, 100)
+          && isText(data.enquiry, 1, 40)
+          && isText(data.message, 1, 5000)
+          && optionalText(data, 'email', 200)
+          && optionalText(data, 'phone', 40)
+          && optionalText(data, 'product', 120)
+          && optionalText(data, 'preferredContact', 20)
+          && optionalText(data, 'page', 120)
+          && (hasText(data, 'email') || hasText(data, 'phone'))
+          && data.status == 'New'
+          && isText(data.source, 1, 60)
+          && data.createdAt == request.time;
+      }
+
+      allow create: if validMessage();
+      allow read, delete: if isManager();
+      allow update: if isManager() && managerEdit();
+    }
+
+    // ── Booking-system leads (the "get started" form) ────────────────────
+    match /Bookings/{leadId} {
+      function validLead() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['fullName', 'phone', 'email', 'businessName', 'businessType', 'businessTypeSpecific', 'city', 'websiteStatus', 'plan', 'mainGoal', 'bookingProblem', 'reservationChoice', 'paymentStatus', 'paymentRequired', 'pendingId', 'status', 'source', 'createdAt'])
+          && data.keys().hasAll(['fullName', 'phone', 'email', 'businessName', 'status', 'source', 'createdAt'])
+          && isText(data.fullName, 1, 100)
+          && isText(data.phone, 1, 40)
+          && isText(data.email, 3, 200)
+          && isText(data.businessName, 1, 120)
+          && optionalText(data, 'businessType', 80)
+          && optionalText(data, 'businessTypeSpecific', 80)
+          && optionalText(data, 'city', 80)
+          && optionalText(data, 'websiteStatus', 80)
+          && optionalText(data, 'plan', 40)
+          && optionalText(data, 'reservationChoice', 40)
+          && optionalText(data, 'paymentStatus', 40)
+          && optionalText(data, 'pendingId', 40)
+          && optionalTextList(data, 'mainGoal')
+          && optionalTextList(data, 'bookingProblem')
+          && (!('paymentRequired' in data) || data.paymentRequired is bool)
+          && data.status in ['New', 'Pending Payment', 'Paid - New Booking']
+          && isText(data.source, 1, 60)
+          && data.createdAt == request.time;
+      }
+
+      allow create: if validLead();
+      allow read, delete: if isManager();
+      allow update: if isManager() && managerEdit();
+    }
+
+    // Everything else is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

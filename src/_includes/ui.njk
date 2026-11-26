@@ -1,0 +1,60 @@
+{#
+  Small building blocks shared by every page.
+  Import with:  {% import "ui.njk" as ui %}
+#}
+
+{# An icon from the sprite. Names are listed in scripts/build-icons.mjs. #}
+{% macro icon(name, cls='') -%}
+<svg class="icon{% if cls %} {{ cls }}{% endif %}" aria-hidden="true" focusable="false"><use href="{{ '/assets/icons.svg' | bust }}#{{ name }}"></use></svg>
+{%- endmacro %}
+
+{# A standard 4:3 photo. `src` is "<section>/<name>" under assets/img. #}
+{% macro img(src, alt, sizes='(min-width: 1100px) 380px, (min-width: 640px) 46vw, 92vw', eager=false, cls='') -%}
+<img{% if cls %} class="{{ cls }}"{% endif %} src="/assets/img/{{ src }}-1280.webp" srcset="/assets/img/{{ src }}-640.webp 640w, /assets/img/{{ src }}-1280.webp 1280w" sizes="{{ sizes }}" alt="{{ alt }}" width="1280" height="956" {% if eager %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+{%- endmacro %}
+
+{# A wide 16:9 banner photo from assets/img/hero. #}
+{% macro wide(name, alt, sizes='(min-width: 1240px) 1200px, 94vw', eager=true, cls='') -%}
+<img{% if cls %} class="{{ cls }}"{% endif %} src="/assets/img/hero/{{ name }}-1280.webp" srcset="/assets/img/hero/{{ name }}-640.webp 640w, /assets/img/hero/{{ name }}-1280.webp 1280w, /assets/img/hero/{{ name }}-1920.webp 1920w" sizes="{{ sizes }}" alt="{{ alt }}" width="1920" height="1086" {% if eager %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
+{%- endmacro %}
+
+{# The pill label that sits above a heading. #}
+{% macro eyebrow(text, iconName='') -%}
+<p class="eyebrow">{% if iconName %}{{ icon(iconName) }}{% endif %}<span>{{ text }}</span></p>
+{%- endmacro %}
+
+{#
+  Call / WhatsApp / Message buttons. Call and WhatsApp only appear once the
+  numbers are filled in in src/_data/site.js.
+    service  – preselects the enquiry type in the message form
+    product  – prefills what the visitor is asking about
+    label    – text for the message button
+#}
+{% macro contact(site, service='', product='', label='Send a message', size='', primary='message') -%}
+<div class="actions">
+  {% if site.phone -%}
+  <a class="btn {% if primary == 'call' %}btn--primary{% else %}btn--outline{% endif %}{% if size %} btn--{{ size }}{% endif %}" href="{{ site.phone | tel }}">{{ icon('phone-fill') }}<span>Call {{ site.phoneDisplay or site.phone }}</span></a>
+  {%- endif %}
+  {% if site.whatsapp -%}
+  <a class="btn btn--whatsapp{% if size %} btn--{{ size }}{% endif %}" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about ' + (product or service or 'your services') + '.') }}" target="_blank" rel="noopener">{{ icon('whatsapp-logo-fill') }}<span>WhatsApp us</span></a>
+  {%- endif %}
+  <button class="btn {% if primary == 'message' or not site.phone %}btn--primary{% else %}btn--outline{% endif %}{% if size %} btn--{{ size }}{% endif %}" type="button" data-quote{% if service %} data-service="{{ service }}"{% endif %}{% if product %} data-product="{{ product }}"{% endif %}>{{ icon('chat-circle-text-fill') }}<span>{{ label }}</span></button>
+</div>
+{%- endmacro %}
+
+{# Frequently asked questions as native, keyboard-friendly accordions. #}
+{% macro faqs(items, center=false) -%}
+<div class="faq{% if center %} faq--center{% endif %}">
+  {% for item in items -%}
+  <details class="faq__item">
+    <summary><span>{{ item.q }}</span>{{ icon('plus') }}</summary>
+    <div class="faq__answer"><p>{{ item.a }}</p></div>
+  </details>
+  {%- endfor %}
+</div>
+{%- endmacro %}
+
+{# Comparison-table cell: tick, dash or a short note. #}
+{% macro cell(value) -%}
+{% if value === true %}<span class="yes">{{ icon('check') }}<span class="sr-only">Included</span></span>{% elif value === false %}<span class="no" aria-hidden="true">—</span><span class="sr-only">Not included</span>{% else %}<span class="note">{{ value }}</span>{% endif %}
+{%- endmacro %}

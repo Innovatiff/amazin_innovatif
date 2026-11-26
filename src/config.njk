@@ -1,0 +1,17 @@
+---
+permalink: /assets/js/config.js
+eleventyExcludeFromCollections: true
+---
+// Generated from src/_data/site.js — edit that file, not this one.
+export const SITE = {{ { name: site.name, phone: site.phone, whatsapp: site.whatsapp, depositLink: site.depositLink, depositAmount: site.depositAmount } | json | safe }};
+
+export const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/{{ site.firebaseSdkVersion }}';
+
+// On your own computer the site talks to the local Firebase emulators
+// (npm run emulators), never to the live database.
+export const LOCAL = ['localhost', '127.0.0.1'].includes(location.hostname);
+
+export const firebaseConfig = {{ site.firebase | json | safe }};
+if (LOCAL) firebaseConfig.projectId = 'demo-innovatif';
+
+export const EMULATORS = { firestore: ['127.0.0.1', 8085], auth: 'http://127.0.0.1:9099' };

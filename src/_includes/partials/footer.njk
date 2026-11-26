@@ -1,0 +1,64 @@
+{% import "ui.njk" as ui %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a class="brand" href="/" aria-label="{{ site.name }} — home">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__name">{{ site.name }}</span>
+        </a>
+        <p>{{ site.tagline }}</p>
+        <ul class="site-footer__contact">
+          {% if site.phone %}<li><a href="{{ site.phone | tel }}">{{ ui.icon('phone') }}<span>{{ site.phoneDisplay or site.phone }}</span></a></li>{% endif %}
+          {% if site.whatsapp %}<li><a href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '!') }}" target="_blank" rel="noopener">{{ ui.icon('whatsapp-logo') }}<span>WhatsApp</span></a></li>{% endif %}
+          {% if site.email %}<li><a href="mailto:{{ site.email }}">{{ ui.icon('envelope-simple') }}<span>{{ site.email }}</span></a></li>{% endif %}
+          <li><button type="button" class="link-button" data-quote>{{ ui.icon('chat-circle-text') }}<span>Send us a message</span></button></li>
+          {% if site.address %}<li><span>{{ ui.icon('map-pin') }}<span>{{ site.address }}</span></span></li>{% endif %}
+          {% if site.hours %}<li><span>{{ ui.icon('clock') }}<span>{{ site.hours }}</span></span></li>{% endif %}
+        </ul>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Services">
+        <h2>Services</h2>
+        <ul>
+          <li><a href="/printing">Printing &amp; marketing</a></li>
+          <li><a href="/websites">Websites</a></li>
+          <li><a href="/booking">Booking system</a></li>
+          <li><a href="/software">Custom software</a></li>
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Printing">
+        <h2>Printing</h2>
+        <ul>
+          {% for category in print.categories -%}
+          <li><a href="/printing#{{ category.id }}">{{ category.short }}</a></li>
+          {%- endfor %}
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Software">
+        <h2>Software</h2>
+        <ul>
+          {% for item in software.flagship -%}
+          <li><a href="/software#{{ item.id }}">{{ item.short }}</a></li>
+          {%- endfor %}
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Company">
+        <h2>Company</h2>
+        <ul>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="/get-started">Start a booking system</a></li>
+          <li><a href="/portal">Manager login</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>&copy; {{ site.year }} {{ site.legalName }} — All rights reserved.</p>
+      <p>Product photos are illustrations of what we make; the brands shown are examples.</p>
+    </div>
+  </div>
+</footer>

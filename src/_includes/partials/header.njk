@@ -1,0 +1,31 @@
+{% import "ui.njk" as ui %}
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a class="brand" href="/" aria-label="{{ site.name }} — home">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__name">{{ site.name }}</span>
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+      <ul class="site-nav__list">
+        {% for item in site.nav -%}
+        <li><a class="site-nav__link" href="{{ item.href }}"{% if key == item.key %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+        {%- endfor %}
+      </ul>
+      <div class="site-nav__mobile-actions">
+        {{ ui.contact(site, label='Get a free quote') }}
+      </div>
+    </nav>
+
+    <div class="site-header__actions">
+      {% if site.phone -%}
+      <a class="header-phone" href="{{ site.phone | tel }}" aria-label="Call {{ site.phoneDisplay or site.phone }}">{{ ui.icon('phone-fill') }}<span>{{ site.phoneDisplay or site.phone }}</span></a>
+      {%- endif %}
+      <button class="btn btn--primary btn--sm header-cta" type="button" data-quote>Get a quote</button>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <span class="sr-only">Menu</span>
+        <span class="nav-toggle__bars" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,156 @@
+---
+layout: layouts/base.njk
+permalink: /websites.html
+key: websites
+accent: web
+shareImage: web-hero
+title: Business websites from $49.99/month | Innovatif
+description: Professional, mobile-friendly websites for local businesses. Two simple plans — Starter at $49.99/month and Pro at $99.99/month — designed, built and hosted by Innovatif.
+---
+{% import "ui.njk" as ui %}
+
+<section class="page-hero page-hero--split page-hero--media-lg">
+  <div class="container">
+    <div class="page-hero__text">
+      {{ ui.eyebrow('Websites', 'browser') }}
+      <h1>A website your customers will trust</h1>
+      <p class="lead">Fast, good-looking and easy to use on a phone. We design it, write it, host it and look after it — you just answer the enquiries.</p>
+      <div class="actions">
+        <a class="btn btn--primary" href="#plans">See the plans {{ ui.icon('arrow-right') }}</a>
+        <button class="btn btn--outline" type="button" data-quote data-service="Websites">{{ ui.icon('chat-circle-text-fill') }}<span>Ask a question</span></button>
+      </div>
+      <p class="page-hero__note">{{ ui.icon('timer') }}<span>Most sites are live within days of receiving your details.</span></p>
+    </div>
+    <div class="page-hero__media page-hero__media--wide">
+      {{ ui.wide('web-hero', 'The same website shown on a desktop monitor, laptop, tablet and phone', '(min-width: 900px) 46vw, 94vw') }}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="plans">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Website plans', 'tag') }}
+      <h2>Two plans. No surprises.</h2>
+      <p class="lead">Pick the one that fits today — you can move up whenever your business is ready.</p>
+    </header>
+
+    <div class="plans plans--2">
+      {% for plan in plans.websites -%}
+      <article class="plan{% if plan.best %} plan--best{% endif %}">
+        {% if plan.best %}<span class="plan__flag">{{ ui.icon('star-fill') }}Best offer</span>{% endif %}
+        <header class="plan__head">
+          <h3>{{ plan.name }}</h3>
+          <p>{{ plan.tagline }}</p>
+        </header>
+        <div class="plan__price">
+          <p class="plan__amount"><strong>{{ plan.price }}</strong><span>{{ plan.period }}</span></p>
+          <p class="plan__meta"><span>{{ ui.icon('timer') }}{{ plan.ready }}</span></p>
+        </div>
+        <ul class="plan__features">
+          {% for feature in plan.features -%}
+          <li>{{ ui.icon('check') }}<span>{{ feature }}</span></li>
+          {%- endfor %}
+          <li class="plan__best-for"><strong>Best for:</strong> {{ plan.bestFor }}</li>
+        </ul>
+        <button class="btn {% if plan.best %}btn--accent{% else %}btn--outline{% endif %} btn--block" type="button" data-quote data-service="Websites" data-product="{{ plan.name }} website — {{ plan.price }}{{ plan.period }}">Get started with {{ plan.name }}</button>
+      </article>
+      {%- endfor %}
+    </div>
+    <p class="fineprint">Need online booking, ordering or something custom? See the <a href="/booking">booking system</a> and <a href="/software">software</a> pages, or just ask.</p>
+  </div>
+</section>
+
+<section class="section section--soft" id="included">
+  <div class="container">
+    <header class="section-head">
+      {{ ui.eyebrow('Every website', 'check-circle-fill') }}
+      <h2>Built properly, whichever plan you choose</h2>
+    </header>
+    <div class="grid grid--3">
+      {% for item in plans.websiteExtras -%}
+      <div class="card">
+        <span class="card__icon">{{ ui.icon(item.icon) }}</span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.text }}</p>
+      </div>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="examples">
+  <div class="container">
+    <header class="section-head">
+      {{ ui.eyebrow('For every kind of business', 'storefront') }}
+      <h2>Designed around what you do</h2>
+      <p class="lead">A restaurant, a barber and a contractor need very different websites. Yours is designed for your customers — not squeezed into a template.</p>
+    </header>
+    <div class="gallery">
+      <figure>{{ ui.img('web/restaurant', 'A restaurant website concept on a laptop', '(min-width: 760px) 48vw, 94vw') }}<figcaption>Restaurants &amp; cafés</figcaption></figure>
+      <figure>{{ ui.img('web/contractor', 'A contractor website concept on a desktop monitor', '(min-width: 760px) 48vw, 46vw') }}<figcaption>Contractors &amp; home services</figcaption></figure>
+      <figure>{{ ui.img('web/barbershop-mobile', 'A barbershop website concept on a phone', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Barbers &amp; salons</figcaption></figure>
+      <figure>{{ ui.img('web/flower-shop', 'A flower shop website concept on a laptop and phone', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Shops &amp; florists</figcaption></figure>
+      <figure>{{ ui.img('web/online-store', 'An online store concept on a tablet', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Online stores</figcaption></figure>
+    </div>
+    <p class="fineprint">Design concepts shown for illustration.</p>
+  </div>
+</section>
+
+<section class="section section--soft" id="found">
+  <div class="container split split--reverse">
+    <div class="split__text">
+      {{ ui.eyebrow('Get found', 'map-pin') }}
+      <h2>Be the business people find first</h2>
+      <p class="lead">When someone nearby searches for what you do, your website and business profile should show up looking open, trusted and easy to reach.</p>
+      <ul class="ticks">
+        <li>{{ ui.icon('check') }}<span>Pages structured so search engines understand them</span></li>
+        <li>{{ ui.icon('check') }}<span>Call, directions and website buttons that just work</span></li>
+        <li>{{ ui.icon('check') }}<span>Reviews and opening hours where customers look for them</span></li>
+      </ul>
+    </div>
+    <div class="split__media">
+      {{ ui.img('web/local-search', 'A phone showing a local business at the top of map search results', '(min-width: 900px) 46vw, 94vw') }}
+    </div>
+  </div>
+</section>
+
+<section class="section" id="process">
+  <div class="container split">
+    <div class="split__text">
+      {{ ui.eyebrow('How it works', 'lightning') }}
+      <h2>Live in days, not months</h2>
+      <ol class="ticks">
+        <li>{{ ui.icon('check') }}<span><strong>Send us your details.</strong> Business name, services, contact info, hours and any photos or logo you have.</span></li>
+        <li>{{ ui.icon('check') }}<span><strong>We design and write it.</strong> You get a preview to review on your own phone.</span></li>
+        <li>{{ ui.icon('check') }}<span><strong>You approve, we launch.</strong> We connect your domain and put it live.</span></li>
+        <li>{{ ui.icon('check') }}<span><strong>We keep it running.</strong> Need a change later? Message us.</span></li>
+      </ol>
+      <div>
+        <p class="fineprint fineprint--left">Popular add-ons</p>
+        <ul class="chips chips--lg">
+          {% for addon in plans.websiteAddons %}<li>{{ addon }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="split__media">
+      {{ ui.img('web/design-process', 'Website wireframe sketches and a finished design on a designer’s desk', '(min-width: 900px) 46vw, 94vw') }}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft" id="faq">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Questions', 'question') }}
+      <h2>Website questions, answered</h2>
+    </header>
+    {{ ui.faqs(plans.websiteFaqs, true) }}
+  </div>
+</section>
+
+{% set ctaTitle = 'Let’s get your business online' %}
+{% set ctaText = 'Tell us about your business and which plan you’re thinking about. We’ll reply with the next steps.' %}
+{% set ctaService = 'Websites' %}
+{% set ctaLabel = 'Start my website' %}
+{% include "partials/cta.njk" %}
