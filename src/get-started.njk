@@ -3,6 +3,7 @@ layout: layouts/base.njk
 permalink: /get-started.html
 key: get-started
 accent: booking
+backdrop: calendar
 pageScript: /assets/js/booking-form.js
 title: Get your booking system — Innovatif
 description: Tell us about your business and reserve your spot. We only accept one business per category per town.
@@ -10,16 +11,17 @@ description: Tell us about your business and reserve your spot. We only accept o
 {% import "ui.njk" as ui %}
 
 <section class="page-hero">
+  <div class="backdrop backdrop--calendar" aria-hidden="true"></div>
   <div class="container">
-    <div class="page-hero__text page-hero__text--center">
-      {{ ui.eyebrow('Booking system', 'calendar-check') }}
-      <h1>Let’s build your booking system</h1>
-      <p class="lead">Five quick steps. It takes about two minutes, and we’ll check availability for your category and town.</p>
+    <div class="page-hero__text">
+      {{ ui.eyebrow('Booking system', '📅') }}
+      <h1>Let’s build your <span class="grad">booking system.</span></h1>
+      <p class="lead">Five quick steps, about two minutes. We’ll check availability for your category and town.</p>
     </div>
   </div>
 </section>
 
-<section class="section section--tight">
+<section class="section section--tight section--flush-top">
   <div class="container">
     <form class="wizard panel" data-booking-form novalidate>
       <div class="wizard__progress" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>

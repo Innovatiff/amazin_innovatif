@@ -288,6 +288,7 @@ await step('the portal asks for a sign-in and rejects a wrong password', async (
   await portal.goto(`${SITE}/portal`, { waitUntil: 'networkidle' });
   await portal.locator('[data-view="signin"]').waitFor();
   await shot(portal, 'portal-signin');
+  assert.deepEqual(problems, [], 'the portal page itself should load cleanly');
   await portal.locator('#p-email').fill(MANAGER.email);
   await portal.locator('#p-password').fill('wrong-password');
   await portal.locator('[data-signin-button]').click();
@@ -401,15 +402,32 @@ await step('the menu and message form work at phone size', async () => {
   const mobile = await phone.newPage();
   await mobile.goto(SITE, { waitUntil: 'networkidle' });
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, 'page scrolls sideways');
-  await mobile.locator('[data-nav-toggle]').click();
+  // People open the menu halfway down a page, so test it there — with a real
+  // tap, because a scripted click would scroll the page itself first.
+  await mobile.evaluate(() => window.scrollTo({ top: 1500, behavior: 'instant' }));
+  const toggle = await mobile.locator('[data-nav-toggle]').boundingBox();
+  await mobile.touchscreen.tap(toggle.x + toggle.width / 2, toggle.y + toggle.height / 2);
   await mobile.locator('#site-nav.is-open').getByRole('link', { name: 'Contact' }).waitFor();
   await mobile.waitForTimeout(400); // let the menu finish sliding in
   const menu = await mobile.locator('#site-nav').boundingBox();
-  assert.ok(menu.height > 700 && menu.width === 390, `menu should fill the screen, got ${menu.width}×${menu.height}`);
+  assert.ok(menu.y >= 0 && menu.y < 80 && menu.height > 700 && menu.width === 390,
+    `menu should fill the screen, got ${menu.width}×${menu.height} at ${menu.y}px from the top`);
+  assert.equal(await mobile.evaluate(() => Math.round(window.scrollY)), 1500, 'opening the menu moved the page');
   await shot(mobile, 'mobile-menu');
   await mobile.locator('#site-nav').getByRole('link', { name: 'Printing' }).click();
   await mobile.waitForURL(`${SITE}/printing`);
-  await mobile.locator('.dock [data-quote]').click();
+  // Nothing asking for a quote may stay pinned to the screen while scrolling.
+  const pinned = await mobile.evaluate(() => [...document.querySelectorAll('[data-quote]')]
+    .filter((el) => el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }))
+    .filter((el) => {
+      for (let node = el; node && node !== document.body; node = node.parentElement) {
+        if (['fixed', 'sticky'].includes(getComputedStyle(node).position)) return true;
+      }
+      return false;
+    })
+    .map((el) => el.textContent.trim()));
+  assert.deepEqual(pinned, [], 'a quote button is pinned to the phone screen');
+  await mobile.locator('.page-hero [data-quote]').click();
   await mobile.locator('#quote-dialog[open]').waitFor();
   await shot(mobile, 'mobile-form');
   await phone.close();

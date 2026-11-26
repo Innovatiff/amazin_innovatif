@@ -1,15 +1,12 @@
 {% import "ui.njk" as ui %}
-{# Pages that are themselves a form don't need a floating "message" button. #}
-{% set dockMessage = key != 'contact' and key != 'get-started' %}
-{% set dock = dockMessage or site.phone or site.whatsapp %}
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>{{ title }}</title>
     <meta name="description" content="{{ description }}">
-    <meta name="theme-color" content="#0a0a0a">
+    <meta name="theme-color" content="#000000">
     <meta name="color-scheme" content="dark">
     {% if noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
     {% if site.url %}<link rel="canonical" href="{{ site.url }}{{ page.url | replace('.html', '') }}">{% endif %}
@@ -29,8 +26,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <link rel="preload" href="/assets/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/inter-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ '/assets/css/site.css' | bust }}">
     <script type="module" src="{{ '/assets/js/site.js' | bust }}"></script>
     {% if pageScript %}<script type="module" src="{{ pageScript | bust }}"></script>{% endif %}
@@ -49,7 +45,7 @@
     } | json | safe }}</script>
     {%- endif %}
   </head>
-  <body data-accent="{{ accent or 'neutral' }}" data-page="{{ key }}"{% if dock %} data-dock{% endif %}>
+  <body data-accent="{{ accent or 'neutral' }}" data-page="{{ key }}">
     <a class="skip-link" href="#main">Skip to content</a>
     {% include "partials/header.njk" %}
     <main id="main">
@@ -57,6 +53,10 @@
     </main>
     {% include "partials/footer.njk" %}
     {% include "partials/quote-dialog.njk" %}
-    {% include "partials/dock.njk" %}
+    {% if site.whatsapp and site.whatsappBubble -%}
+    <aside aria-label="WhatsApp">
+      <a class="wa-fab" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about your services.') }}" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">{{ ui.icon('whatsapp-logo-fill') }}</a>
+    </aside>
+    {%- endif %}
   </body>
 </html>

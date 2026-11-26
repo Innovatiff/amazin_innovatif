@@ -31,6 +31,9 @@ Open `src/_data/site.js` and fill in `phone`, `phoneDisplay` and `whatsapp`
 numbers are filled in, the Call and WhatsApp buttons stay hidden and visitors
 are sent to the message form instead.
 
+Once `whatsapp` is filled in, a small round WhatsApp button also floats in the
+corner of every page. To hide it, set `whatsappBubble: false` in the same file.
+
 ### 2. Turn on the portal login (once, in the Firebase console)
 
 Open the [Firebase console](https://console.firebase.google.com) → project
@@ -95,7 +98,8 @@ Booking-system requests from `/get-started` work the same way and appear under
 | Print products and categories | `src/_data/print.js` |
 | Software products | `src/_data/software.js` |
 | Home page sections | `src/_data/home.js` and `src/index.njk` |
-| Colors, fonts, spacing | `src/assets/css/site.css` |
+| Headlines and wording on a page | that page's file in `src/` (e.g. `src/printing.njk`) |
+| Colors, type sizes, spacing, backgrounds | the list of settings at the top of `src/assets/css/site.css` |
 
 **Add a product photo:** put the full-size pictures in a folder, then
 

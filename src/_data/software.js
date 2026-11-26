@@ -1,5 +1,6 @@
 /**
- * The software page. `flagship` are the big feature rows, `more` the photo
+ * The software page. `flagship` are the big feature rows (`kicker` is the
+ * small coloured line above each title), `more` the photo
  * grid underneath, `also` the plain list at the end. Software is priced per
  * project, so there are no prices here — every card leads to call or message.
  */
@@ -7,7 +8,9 @@ export default {
   flagship: [
     {
       id: 'pos',
+      emoji: '💳',
       short: 'Advanced POS',
+      kicker: 'Sell faster',
       name: 'Advanced POS',
       icon: 'cash-register',
       badge: '100,000+ products',
@@ -17,7 +20,9 @@ export default {
     },
     {
       id: 'restaurant-ordering',
+      emoji: '🍽️',
       short: 'Restaurant ordering',
+      kicker: 'More orders, less chaos',
       name: 'Restaurant ordering system',
       icon: 'fork-knife',
       badge: 'Dine-in · Pickup · Delivery',
@@ -27,7 +32,9 @@ export default {
     },
     {
       id: 'ai-receptionist',
+      emoji: '🤖',
       short: 'AI receptionist',
+      kicker: 'Always answering',
       name: 'AI receptionist',
       icon: 'robot',
       badge: 'Answers 24/7',
@@ -37,7 +44,9 @@ export default {
     },
     {
       id: 'custom-software',
+      emoji: '🧩',
       short: 'Tailored software',
+      kicker: 'Made to measure',
       name: 'Tailored-to-your-needs software',
       icon: 'code',
       badge: 'Built around you',
@@ -47,7 +56,9 @@ export default {
     },
     {
       id: 'employee-management',
+      emoji: '👥',
       short: 'Employee management',
+      kicker: 'Your team, organized',
       name: 'Employee management software',
       icon: 'users-three',
       badge: 'Schedules · Time clock',
@@ -57,7 +68,9 @@ export default {
     },
     {
       id: 'inventory',
+      emoji: '📦',
       short: 'Inventory software',
+      kicker: 'Never run out',
       name: 'Inventory software',
       icon: 'barcode',
       badge: 'Real-time stock',
@@ -68,18 +81,18 @@ export default {
   ],
 
   more: [
-    { id: 'kitchen-display', name: 'Kitchen display systems', icon: 'cooking-pot', text: 'Replace paper tickets with live order screens, timers and status by station.' },
-    { id: 'self-order-kiosk', name: 'Self-order kiosks', icon: 'cursor-click', text: 'Let customers order and pay on a touchscreen and keep the queue moving.' },
-    { id: 'digital-menu-boards', name: 'Digital menu boards', icon: 'monitor', text: 'Update prices, photos and specials on every screen from one place.' },
-    { id: 'crm', name: 'CRM & customer management', icon: 'address-book', text: 'Track every lead, quote and customer conversation from first contact to repeat sale.' },
-    { id: 'invoicing', name: 'Invoicing & billing', icon: 'receipt', text: 'Create quotes and invoices, take payments and see who still owes you.' },
-    { id: 'delivery-tracking', name: 'Delivery & dispatch', icon: 'truck', text: 'Assign drivers, follow orders on a live map and keep customers updated.' },
-    { id: 'loyalty-rewards', name: 'Loyalty & rewards', icon: 'gift', text: 'Digital stamp cards, points and offers that give customers a reason to return.' },
-    { id: 'ecommerce', name: 'Online stores', icon: 'shopping-cart', text: 'Sell online with product pages, checkout, order management and shipping labels.' },
-    { id: 'mobile-apps', name: 'Mobile apps', icon: 'device-mobile', text: 'Your own branded app for bookings, orders, memberships or your team.' },
-    { id: 'analytics', name: 'Dashboards & reporting', icon: 'chart-line-up', text: 'See sales, orders and customers in one live view instead of five spreadsheets.' },
-    { id: 'ai-chatbot', name: 'AI chatbots & automation', icon: 'chats-circle', text: 'Answer website and WhatsApp questions instantly and automate the repetitive work.' },
-    { id: 'field-service', name: 'Field service management', icon: 'wrench', text: 'Work orders, checklists, routes and sign-off for technicians on the road.' },
+    { id: 'kitchen-display', emoji: '🍳', name: 'Kitchen display systems', icon: 'cooking-pot', text: 'Replace paper tickets with live order screens, timers and status by station.' },
+    { id: 'self-order-kiosk', emoji: '🖥️', name: 'Self-order kiosks', icon: 'cursor-click', text: 'Let customers order and pay on a touchscreen and keep the queue moving.' },
+    { id: 'digital-menu-boards', emoji: '📺', name: 'Digital menu boards', icon: 'monitor', text: 'Update prices, photos and specials on every screen from one place.' },
+    { id: 'crm', emoji: '🤝', name: 'CRM & customer management', icon: 'address-book', text: 'Track every lead, quote and customer conversation from first contact to repeat sale.' },
+    { id: 'invoicing', emoji: '🧾', name: 'Invoicing & billing', icon: 'receipt', text: 'Create quotes and invoices, take payments and see who still owes you.' },
+    { id: 'delivery-tracking', emoji: '🚚', name: 'Delivery & dispatch', icon: 'truck', text: 'Assign drivers, follow orders on a live map and keep customers updated.' },
+    { id: 'loyalty-rewards', emoji: '⭐', name: 'Loyalty & rewards', icon: 'gift', text: 'Digital stamp cards, points and offers that give customers a reason to return.' },
+    { id: 'ecommerce', emoji: '🛒', name: 'Online stores', icon: 'shopping-cart', text: 'Sell online with product pages, checkout, order management and shipping labels.' },
+    { id: 'mobile-apps', emoji: '📱', name: 'Mobile apps', icon: 'device-mobile', text: 'Your own branded app for bookings, orders, memberships or your team.' },
+    { id: 'analytics', emoji: '📊', name: 'Dashboards & reporting', icon: 'chart-line-up', text: 'See sales, orders and customers in one live view instead of five spreadsheets.' },
+    { id: 'ai-chatbot', emoji: '💬', name: 'AI chatbots & automation', icon: 'chats-circle', text: 'Answer website and WhatsApp questions instantly and automate the repetitive work.' },
+    { id: 'field-service', emoji: '🔧', name: 'Field service management', icon: 'wrench', text: 'Work orders, checklists, routes and sign-off for technicians on the road.' },
   ],
 
   also: [

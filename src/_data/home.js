@@ -1,8 +1,9 @@
 /** Content for the home page. Images are "<section>/<name>" under assets/img. */
 import plans from './plans.js';
+import print from './print.js';
 
 export default {
-  // The two scrolling rows under the headline: [image, caption]
+  // The two scrolling photo rows under the headline: [image, caption]
   marquee: [
     [
       ['print/business-cards', 'Business cards'], ['print/t-shirts', 'T-shirts'], ['print/vinyl-banners', 'Banners'],
@@ -18,16 +19,27 @@ export default {
     ],
   ],
 
+  // The four things Innovatif does, each with the one number worth remembering.
+  doors: [
+    { accent: 'print', emoji: '🖨️', big: print.total, label: 'print products, designed and printed for you', href: '/printing', link: 'Explore printing' },
+    { accent: 'web', emoji: '🌐', big: plans.websites[0].price, label: 'a month for a professional website', href: '/websites', link: 'See the plans' },
+    { accent: 'booking', emoji: '📅', big: '7 days', label: 'to a live online booking system', href: '/booking', link: 'See how it works' },
+    { accent: 'software', emoji: '⚙️', big: '100,000+', label: 'products handled by our advanced POS', href: '/software', link: 'Explore software' },
+  ],
+
   // Eight print products for the photo mosaic (the 1st and 6th are shown large).
   mosaic: ['t-shirts', 'business-cards', 'die-cut-stickers', 'posters', 'caps-hats', 'vehicle-wraps', 'custom-boxes', 'neon-signs'],
 
   why: [
-    { icon: 'stack', title: 'Everything in one place', text: 'Your print, website, booking and software come from the same team, so nothing gets lost between suppliers.' },
-    { icon: 'palette', title: 'A brand that matches', text: 'The same colors, logo and voice on your cards, your van, your website and your checkout screen.' },
-    { icon: 'pen-nib', title: 'Design in-house', text: 'No logo or artwork yet? We design it, then use it across everything we make for you.' },
-    { icon: 'receipt', title: 'Clear quotes', text: 'You know the price before any work begins. No hidden extras and no surprises on the invoice.' },
-    { icon: 'headset', title: 'Real people', text: 'Call, WhatsApp or message and you talk to someone who knows your project.' },
-    { icon: 'rocket-launch', title: 'Built to grow', text: 'Start with business cards or a one-page site, and add booking, ordering or a full system when you’re ready.' },
+    { emoji: '🤝', title: 'Everything in one place', text: 'Print, website, booking and software from the same team — nothing gets lost between suppliers.' },
+    { emoji: '🎨', title: 'A brand that matches', text: 'The same colors, logo and voice on your cards, your van, your website and your checkout screen.' },
+    { emoji: '🧾', title: 'Clear quotes, no surprises', text: 'You know the price before any work begins. No hidden extras on the invoice.' },
+  ],
+
+  steps: [
+    { image: 'general/chat-support', alt: 'A customer asking for a quote by message', title: 'Tell us what you need', text: 'Send a message or give us a call. A rough idea is enough — we’ll ask the right questions.' },
+    { image: 'general/design-studio', alt: 'A designer working on a brand identity', title: 'We quote, design and build', text: 'A clear price first. Then a proof or preview for you to approve before anything is final.' },
+    { image: 'general/order-pickup', alt: 'A finished order being handed to a customer', title: 'Collect it or go live', text: 'Pick up your order or watch your site go live. We’re still here when you need changes.' },
   ],
 
   faqs: [

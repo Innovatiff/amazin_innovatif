@@ -10,6 +10,7 @@ const print = {
   categories: [
     {
       id: 'cards-stationery',
+      emoji: '📇',
       title: 'Business cards & stationery',
       short: 'Cards & stationery',
       icon: 'identification-card',
@@ -56,6 +57,7 @@ const print = {
     },
     {
       id: 'marketing',
+      emoji: '📣',
       title: 'Flyers, brochures & marketing print',
       short: 'Marketing print',
       icon: 'megaphone',
@@ -132,6 +134,7 @@ const print = {
     },
     {
       id: 'signs',
+      emoji: '🚩',
       title: 'Signs, banners & large format',
       short: 'Signs & banners',
       icon: 'signpost',
@@ -226,6 +229,7 @@ const print = {
     },
     {
       id: 'stickers',
+      emoji: '🏷️',
       title: 'Stickers, labels & vinyl',
       short: 'Stickers & labels',
       icon: 'sticker',
@@ -266,6 +270,7 @@ const print = {
     },
     {
       id: 'apparel',
+      emoji: '👕',
       title: 'Custom apparel',
       short: 'Apparel',
       icon: 't-shirt',
@@ -324,6 +329,7 @@ const print = {
     },
     {
       id: 'packaging',
+      emoji: '📦',
       title: 'Packaging',
       short: 'Packaging',
       icon: 'package',
@@ -364,6 +370,7 @@ const print = {
     },
     {
       id: 'promo',
+      emoji: '🎁',
       title: 'Promotional products',
       short: 'Promo products',
       icon: 'gift',
@@ -431,5 +438,12 @@ const print = {
 print.byId = Object.fromEntries(
   print.categories.flatMap((category) => category.products.map((product) => [product.id, { ...product, category: category.id }])),
 );
+
+// How many products the page names in total, rounded down to the nearest ten ("140+").
+const named = print.categories.reduce((sum, category) => sum + category.products.length + category.more.length, 0);
+print.total = `${Math.floor(named / 10) * 10}+`;
+
+// Product names for the scrolling line on the home page.
+print.ticker = ['Business cards', 'Flyers', 'Posters', 'Banners', 'T-shirts', 'Hoodies', 'Stickers', 'Labels', 'Vinyl', 'Signs', 'Vehicle wraps', 'Menus', 'Packaging', 'Caps', 'Mugs', 'Tote bags', 'Brochures', 'Neon signs'];
 
 export default print;

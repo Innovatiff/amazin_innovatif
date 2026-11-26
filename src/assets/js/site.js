@@ -113,7 +113,7 @@ for (const form of $$('[data-lead-form]')) {
 
 const motionOk = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (motionOk && 'IntersectionObserver' in window) {
-  const targets = $$('.section-head, .pillar, .tile, .product, .shot, .card, .step, .plan, .feature, .split, .cta__panel, .gallery figure, .faq__item, .trio figure, .category__more');
+  const targets = $$('.section-head, .door, .tile, .product, .shot, .card, .step, .plan, .mini-plan, .feature, .split, .bento__tile, .cta__inner, .gallery figure, .faq, .trio figure, .callout, .also, .category__head, .page-hero__media, .method, .panel');
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -154,14 +154,4 @@ if (catLinks.length && 'IntersectionObserver' in window) {
     const section = document.getElementById(id);
     if (section) spy.observe(section);
   }
-}
-
-/* ── Floating contact button: step aside when the footer is in view ────── */
-
-const dock = $('[data-dock]');
-const footer = $('.site-footer');
-if (dock && footer && 'IntersectionObserver' in window) {
-  new IntersectionObserver(([entry]) => dock.classList.toggle('is-hidden', entry.isIntersecting), {
-    rootMargin: '0px 0px -40% 0px',
-  }).observe(footer);
 }

@@ -3,9 +3,19 @@
   Import with:  {% import "ui.njk" as ui %}
 #}
 
-{# An icon from the sprite. Names are listed in scripts/build-icons.mjs. #}
+{# A line icon from the sprite, for buttons and controls. Names are listed in scripts/build-icons.mjs. #}
 {% macro icon(name, cls='') -%}
 <svg class="icon{% if cls %} {{ cls }}{% endif %}" aria-hidden="true" focusable="false"><use href="{{ '/assets/icons.svg' | bust }}#{{ name }}"></use></svg>
+{%- endmacro %}
+
+{# An emoji used as decoration (hidden from screen readers, which read the text next to it). #}
+{% macro emoji(char) -%}
+<span class="emoji" aria-hidden="true">{{ char }}</span>
+{%- endmacro %}
+
+{# An emoji on a soft coloured tile, like an app icon. Pass 'lg' for the large size. #}
+{% macro emojiTile(char, size='') -%}
+<span class="emoji-tile{% if size %} emoji-tile--{{ size }}{% endif %}" aria-hidden="true">{{ char }}</span>
 {%- endmacro %}
 
 {# A standard 4:3 photo. `src` is "<section>/<name>" under assets/img. #}
@@ -18,27 +28,33 @@
 <img{% if cls %} class="{{ cls }}"{% endif %} src="/assets/img/hero/{{ name }}-1280.webp" srcset="/assets/img/hero/{{ name }}-640.webp 640w, /assets/img/hero/{{ name }}-1280.webp 1280w, /assets/img/hero/{{ name }}-1920.webp 1920w" sizes="{{ sizes }}" alt="{{ alt }}" width="1920" height="1086" {% if eager %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async">
 {%- endmacro %}
 
-{# The pill label that sits above a heading. #}
-{% macro eyebrow(text, iconName='') -%}
-<p class="eyebrow">{% if iconName %}{{ icon(iconName) }}{% endif %}<span>{{ text }}</span></p>
+{# The small coloured label above a headline, with an optional emoji. #}
+{% macro eyebrow(text, emojiChar='') -%}
+<p class="eyebrow">{% if emojiChar %}{{ emoji(emojiChar) }}{% endif %}<span>{{ text }}</span></p>
+{%- endmacro %}
+
+{# "Learn more ›" — the quiet link that sits beside or below a button. #}
+{% macro more(href, text) -%}
+<a class="more" href="{{ href }}">{{ text }}{{ icon('caret-right') }}</a>
 {%- endmacro %}
 
 {#
-  Call / WhatsApp / Message buttons. Call and WhatsApp only appear once the
-  numbers are filled in in src/_data/site.js.
+  The contact buttons: message first, then WhatsApp and Call once the numbers
+  are filled in in src/_data/site.js.
     service  – preselects the enquiry type in the message form
     product  – prefills what the visitor is asking about
     label    – text for the message button
+    size     – 'sm' or 'lg'
 #}
-{% macro contact(site, service='', product='', label='Send a message', size='', primary='message') -%}
-<div class="actions">
-  {% if site.phone -%}
-  <a class="btn {% if primary == 'call' %}btn--primary{% else %}btn--outline{% endif %}{% if size %} btn--{{ size }}{% endif %}" href="{{ site.phone | tel }}">{{ icon('phone-fill') }}<span>Call {{ site.phoneDisplay or site.phone }}</span></a>
-  {%- endif %}
+{% macro contact(site, service='', product='', label='Get a free quote', size='') -%}
+<div class="actions actions--contact">
+  <button class="btn btn--accent{% if size %} btn--{{ size }}{% endif %}" type="button" data-quote{% if service %} data-service="{{ service }}"{% endif %}{% if product %} data-product="{{ product }}"{% endif %}>{{ icon('chat-circle-text-fill') }}<span>{{ label }}</span></button>
   {% if site.whatsapp -%}
-  <a class="btn btn--whatsapp{% if size %} btn--{{ size }}{% endif %}" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about ' + (product or service or 'your services') + '.') }}" target="_blank" rel="noopener">{{ icon('whatsapp-logo-fill') }}<span>WhatsApp us</span></a>
+  <a class="btn btn--whatsapp{% if size %} btn--{{ size }}{% endif %}" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about ' + (product or service or 'your services') + '.') }}" target="_blank" rel="noopener">{{ icon('whatsapp-logo-fill') }}<span class="wide-only">WhatsApp us</span><span class="narrow-only">WhatsApp</span></a>
   {%- endif %}
-  <button class="btn {% if primary == 'message' or not site.phone %}btn--primary{% else %}btn--outline{% endif %}{% if size %} btn--{{ size }}{% endif %}" type="button" data-quote{% if service %} data-service="{{ service }}"{% endif %}{% if product %} data-product="{{ product }}"{% endif %}>{{ icon('chat-circle-text-fill') }}<span>{{ label }}</span></button>
+  {% if site.phone -%}
+  <a class="btn btn--outline{% if size %} btn--{{ size }}{% endif %}" href="{{ site.phone | tel }}">{{ icon('phone-fill') }}<span class="wide-only">Call {{ site.phoneDisplay or site.phone }}</span><span class="narrow-only">Call us</span></a>
+  {%- endif %}
 </div>
 {%- endmacro %}
 

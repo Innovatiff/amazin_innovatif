@@ -3,68 +3,75 @@ layout: layouts/base.njk
 permalink: /contact.html
 key: contact
 accent: neutral
+backdrop: aurora
 title: Contact Innovatif — call, WhatsApp or send a message
 description: Get a quote for printing, a website, a booking system or custom software. Call, WhatsApp or send Innovatif a message and we’ll get back to you.
 ---
 {% import "ui.njk" as ui %}
 
 <section class="page-hero">
+  <div class="backdrop backdrop--aurora" aria-hidden="true"></div>
   <div class="container">
     <div class="page-hero__text">
-      {{ ui.eyebrow('Contact', 'chat-circle-text') }}
-      <h1>How can we help?</h1>
+      {{ ui.eyebrow('Contact', '👋') }}
+      <h1>Let’s <span class="grad" data-accent="print">talk.</span></h1>
       <p class="lead">Tell us what you need — a print job, a website, a booking system or software — and we’ll come back with answers and a clear quote.</p>
     </div>
   </div>
 </section>
 
-<section class="section section--tight">
+<section class="section section--tight section--flush-top">
   <div class="container contact-grid">
     <div class="contact-methods">
       {% if site.phone -%}
-      <a class="method" href="{{ site.phone | tel }}">
-        <span class="card__icon">{{ ui.icon('phone-fill') }}</span>
+      <a class="method" data-accent="web" href="{{ site.phone | tel }}">
+        {{ ui.emojiTile('📞') }}
         <span><strong>Call us</strong><span>{{ site.phoneDisplay or site.phone }}</span></span>
-        {{ ui.icon('arrow-up-right') }}
+        {{ ui.icon('caret-right') }}
       </a>
       {%- endif %}
       {% if site.whatsapp -%}
-      <a class="method method--whatsapp" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about your services.') }}" target="_blank" rel="noopener">
-        <span class="card__icon">{{ ui.icon('whatsapp-logo-fill') }}</span>
+      <a class="method" data-accent="booking" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like to ask about your services.') }}" target="_blank" rel="noopener">
+        {{ ui.emojiTile('💬') }}
         <span><strong>WhatsApp</strong><span>Send photos, files and voice notes</span></span>
-        {{ ui.icon('arrow-up-right') }}
+        {{ ui.icon('caret-right') }}
       </a>
       {%- endif %}
-      <a class="method" href="#message">
-        <span class="card__icon">{{ ui.icon('chat-circle-text-fill') }}</span>
+      <a class="method" data-accent="print" href="#message">
+        {{ ui.emojiTile('✍️') }}
         <span><strong>Send a message</strong><span>Use the form and we’ll reply the way you prefer</span></span>
-        {{ ui.icon('arrow-right') }}
+        {{ ui.icon('caret-right') }}
       </a>
       {% if site.email -%}
-      <a class="method" href="mailto:{{ site.email }}">
-        <span class="card__icon">{{ ui.icon('envelope-simple') }}</span>
+      <a class="method" data-accent="software" href="mailto:{{ site.email }}">
+        {{ ui.emojiTile('✉️') }}
         <span><strong>Email</strong><span>{{ site.email }}</span></span>
-        {{ ui.icon('arrow-up-right') }}
+        {{ ui.icon('caret-right') }}
       </a>
       {%- endif %}
       {% if site.address -%}
-      <div class="method method--static">
-        <span class="card__icon">{{ ui.icon('map-pin') }}</span>
+      <div class="method" data-accent="web">
+        {{ ui.emojiTile('📍') }}
         <span><strong>Find us</strong><span>{{ site.address }}</span></span>
       </div>
       {%- endif %}
       {% if site.hours -%}
-      <div class="method method--static">
-        <span class="card__icon">{{ ui.icon('clock') }}</span>
+      <div class="method" data-accent="software">
+        {{ ui.emojiTile('🕘') }}
         <span><strong>Opening hours</strong><span>{{ site.hours }}</span></span>
       </div>
       {%- endif %}
-      <a class="method" href="/get-started" data-accent="booking">
-        <span class="card__icon">{{ ui.icon('calendar-check') }}</span>
+      <a class="method" data-accent="booking" href="/get-started">
+        {{ ui.emojiTile('📅') }}
         <span><strong>Starting a booking system?</strong><span>Answer a few questions and reserve your spot</span></span>
-        {{ ui.icon('arrow-right') }}
+        {{ ui.icon('caret-right') }}
       </a>
+      {#- The photo fills the space beside the form. Once every contact detail
+          is filled in, the list is already as tall as the form, so it is left out. -#}
+      {% set details = (1 if site.phone else 0) + (1 if site.whatsapp else 0) + (1 if site.email else 0) + (1 if site.address else 0) + (1 if site.hours else 0) %}
+      {% if details <= 3 -%}
       <figure>{{ ui.img('general/chat-support', 'A customer chatting with Innovatif about a print quote', '(min-width: 900px) 40vw, 94vw') }}</figure>
+      {%- endif %}
     </div>
 
     <div class="panel" id="message">
@@ -76,11 +83,11 @@ description: Get a quote for printing, a website, a booking system or custom sof
   </div>
 </section>
 
-<section class="section section--soft">
+<section class="section" data-accent="web">
   <div class="container">
-    <header class="section-head section-head--center">
-      {{ ui.eyebrow('What happens next', 'lightning') }}
-      <h2>From message to quote</h2>
+    <header class="section-head">
+      <p class="eyebrow">What happens next</p>
+      <h2>From message <span class="grad">to quote.</span></h2>
     </header>
     <ol class="steps steps--3">
       <li class="step"><div class="step__body"><h3>We read it properly</h3><p>Your message goes straight to our team — not into a queue of auto-replies.</p></div></li>
