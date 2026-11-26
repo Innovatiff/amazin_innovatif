@@ -453,7 +453,7 @@ function exportCsv() {
   };
   const rows = [columns.map(([title]) => cell(title)).join(','), ...items.map((item) => columns.map(([, get]) => cell(get(item))).join(','))];
   const url = URL.createObjectURL(new Blob([`﻿${rows.join('\r\n')}`], { type: 'text/csv;charset=utf-8' }));
-  const link = h('a', { href: url, download: `innovatif-${state.tab === 'Contact' ? 'messages' : 'booking-leads'}-${new Date().toISOString().slice(0, 10)}.csv` });
+  const link = h('a', { href: url, download: `${SITE.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${state.tab === 'Contact' ? 'messages' : 'booking-leads'}-${new Date().toISOString().slice(0, 10)}.csv` });
   document.body.append(link);
   link.click();
   link.remove();

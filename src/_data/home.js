@@ -1,6 +1,7 @@
 /** Content for the home page. Images are "<section>/<name>" under assets/img. */
 import plans from './plans.js';
 import print from './print.js';
+import site from './site.js';
 
 export default {
   // The two scrolling photo rows under the headline: [image, caption]
@@ -19,7 +20,7 @@ export default {
     ],
   ],
 
-  // The four things Innovatif does, each with the one number worth remembering.
+  // The four things the business does, each with the one number worth remembering.
   doors: [
     { accent: 'print', emoji: '🖨️', big: print.total, label: 'print products, designed and printed for you', href: '/printing', link: 'Explore printing' },
     { accent: 'web', emoji: '🌐', big: plans.websites[0].price, label: 'a month for a professional website', href: '/websites', link: 'See the plans' },
@@ -43,7 +44,7 @@ export default {
   ],
 
   faqs: [
-    { q: 'What does Innovatif do?', a: 'We are an agency for businesses. We design and print marketing materials, build websites and online booking systems, and develop custom software such as POS, ordering, inventory and AI receptionist systems.' },
+    { q: `What does ${site.name} do?`, a: 'We are an agency for businesses. We design and print marketing materials, build websites and online booking systems, and develop custom software such as POS, ordering, inventory and AI receptionist systems.' },
     { q: 'How much does printing cost?', a: 'Print is quoted per job because the price depends on size, material, quantity and finish. Call, WhatsApp or message us with what you need and we will send you a quote.' },
     { q: 'How much is a website?', a: `We have two website plans: ${plans.websites[0].name} at ${plans.websites[0].price}${plans.websites[0].period} and ${plans.websites[1].name} at ${plans.websites[1].price}${plans.websites[1].period}, which is our best offer. The booking system has its own plans starting at ${plans.booking[0].price}${plans.booking[0].period}.` },
     { q: 'How much does software cost?', a: 'Software is priced per project. Tell us what you want it to do and we will give you a clear quote before any work starts.' },

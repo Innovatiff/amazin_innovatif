@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Security rules for the Innovatif website.
+// Security rules for the Amazing Innovatif website.
 //
 //   • Anyone visiting the site may SEND a message or booking request, but only
 //     in the exact shape the forms produce — nothing else can be written.

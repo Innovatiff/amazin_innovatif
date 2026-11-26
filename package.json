@@ -2,7 +2,7 @@
   "name": "innovatif-site",
   "version": "2.0.0",
   "private": true,
-  "description": "Innovatif \u2014 print, websites, online booking and custom software for business.",
+  "description": "Amazing Innovatif \u2014 print, websites, online booking and custom software for business.",
   "type": "module",
   "scripts": {
     "dev": "eleventy --serve --port 8080",

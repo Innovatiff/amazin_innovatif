@@ -4,7 +4,9 @@
  * page, button and link picks it up.
  */
 export default {
-  name: 'Innovatif',
+  // The business name. It is used for the logo, every page title, headings,
+  // the WhatsApp greeting and the manager portal — change it here only.
+  name: 'Amazing Innovatif',
   legalName: 'Innovatif Developments',
   tagline: 'Print, websites, online booking and custom software for business.',
 

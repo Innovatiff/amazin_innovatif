@@ -1,13 +1,13 @@
-# Innovatif website
+# Amazing Innovatif website
 
-The Innovatif site: printing, websites, the booking system, custom software, a
+The Amazing Innovatif site: printing, websites, the booking system, custom software, a
 message form on every page, and a private **manager portal** where those
 messages arrive. It runs on Firebase — Hosting for the site, Firestore for the
 messages, Authentication for the portal login.
 
 | Page | Address | What it is |
 | --- | --- | --- |
-| Home | `/` | Everything Innovatif does, at a glance |
+| Home | `/` | Everything the business does, at a glance |
 | Printing | `/printing` | 54 products with photos, ~90 more listed. No prices — call, WhatsApp or message |
 | Websites | `/websites` | Two plans: $49.99 and $99.99 (best offer) |
 | Booking system | `/booking` | Starter / Pro / Elite with setup fees and the full comparison |
@@ -93,6 +93,7 @@ Booking-system requests from `/get-started` work the same way and appear under
 
 | To change… | Edit |
 | --- | --- |
+| The business name (logo, page titles, headings) | `name` in `src/_data/site.js` |
 | Phone, WhatsApp, email, address, hours | `src/_data/site.js` |
 | Website and booking prices, plan features, FAQs | `src/_data/plans.js` |
 | Print products and categories | `src/_data/print.js` |
@@ -144,8 +145,11 @@ npm run test:e2e
 ```
 
 Drives a real browser through the whole flow — sending messages, the booking
-form, signing in to the portal, reading, updating and deleting. The first time,
-run `npx playwright install chromium`.
+form, signing in to the portal, reading, updating and deleting. It also scrolls
+the printing page with a real mouse wheel and finger drags, uses the category
+chips, opens the phone menu halfway down a page, and checks that nothing is
+wider than a small phone's screen. The first time, run
+`npx playwright install chromium`.
 
 ## What's in the folders
 
@@ -169,6 +173,6 @@ legacy/         The previous site, kept for reference — safe to delete
 - **Email alerts:** new messages show up live in the portal (with an optional
   sound — the bell button). Getting an email for each one needs a Cloud
   Function or the *Trigger Email* extension, which require the paid Blaze plan.
-- **Photos:** the product photos are illustrations of what Innovatif makes; the
+- **Photos:** the product photos are illustrations of what the business makes; the
   brands in them are made-up examples. Swap in photos of real jobs whenever you
   have them.

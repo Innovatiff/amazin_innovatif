@@ -5,8 +5,9 @@ key: printing
 accent: print
 backdrop: halftone
 shareImage: print-hero
-title: Printing & marketing materials — business cards, banners, shirts, stickers | Innovatif
-description: Business cards, flyers, posters, banners, signs, vehicle wraps, shirts, stickers, labels, vinyl, packaging and promo products. Designed and printed by Innovatif — call, WhatsApp or message for a quote.
+title: Printing & marketing materials — business cards, banners, shirts, stickers
+eleventyComputed:
+  description: "Business cards, flyers, posters, banners, signs, vehicle wraps, shirts, stickers, labels, vinyl, packaging and promo products. Designed and printed by {{ site.name }} — call, WhatsApp or message for a quote."
 ---
 {% import "ui.njk" as ui %}
 
@@ -48,7 +49,7 @@ description: Business cards, flyers, posters, banners, signs, vehicle wraps, shi
     <div class="products">
       {% for product in category.products -%}
       <article class="product" id="{{ product.id }}">
-        <div class="product__media">{{ ui.img('print/' + product.id, product.name + ' printed by Innovatif', '(min-width: 1000px) 380px, 46vw') }}</div>
+        <div class="product__media">{{ ui.img('print/' + product.id, product.name + ' printed by ' + site.name, '(min-width: 1000px) 380px, 46vw') }}</div>
         <div class="product__body">
           <h3>{{ product.name }}</h3>
           <p>{{ product.text }}</p>
