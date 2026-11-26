@@ -10,6 +10,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+import site from '../src/_data/site.js';
 
 const SITE = 'http://127.0.0.1:5000';
 const FIRESTORE = 'http://127.0.0.1:8085';
@@ -88,6 +89,33 @@ function watch(page, label) {
   });
 }
 
+// Wait until the page has stopped moving (smooth scrolling takes a moment),
+// then say where it stopped.
+async function settled(target) {
+  let last = -1;
+  for (let i = 0; i < 60; i++) {
+    const y = await target.evaluate(() => Math.round(window.scrollY));
+    if (y === last) return y;
+    last = y;
+    await target.waitForTimeout(150);
+  }
+  return last;
+}
+
+// Where a printing category ended up on screen after jumping to it.
+const categoryOnScreen = (target, hash) => target.evaluate((hash) => {
+  const bar = document.querySelector('.cat-nav').getBoundingClientRect();
+  const row = document.querySelector('.cat-nav__list').getBoundingClientRect();
+  const active = document.querySelector('.cat-nav__link.is-active');
+  const chip = active?.getBoundingClientRect();
+  return {
+    barBottom: Math.round(bar.bottom),
+    headingTop: Math.round(document.querySelector(`${hash} h2`).getBoundingClientRect().top),
+    active: active?.hash,
+    chipInView: Boolean(chip) && chip.left >= row.left - 1 && chip.right <= row.right + 1,
+  };
+}, hash);
+
 async function shot(page, name) {
   if (!SHOTS) return;
   mkdirSync(SHOTS, { recursive: true });
@@ -112,7 +140,8 @@ await step('every page loads without browser errors', async () => {
   for (const path of ['/', '/printing', '/websites', '/booking', '/software', '/contact', '/get-started']) {
     const response = await page.goto(SITE + path, { waitUntil: 'networkidle' });
     assert.equal(response.status(), 200, `${path} returned ${response.status()}`);
-    assert.ok((await page.title()).includes('Innovatif'), `${path} has no title`);
+    assert.ok((await page.title()).includes(site.name), `${path}: the tab title “${await page.title()}” does not include “${site.name}”`);
+    assert.equal((await page.locator('.site-header .brand__name').innerText()).trim(), site.name, `${path}: wrong name next to the logo`);
     assert.ok(response.headers()['content-security-policy'], `${path} is missing its security headers`);
   }
   assert.deepEqual(problems, []);
@@ -137,6 +166,36 @@ await step('printing shows no prices', async () => {
   const text = await page.locator('main').innerText();
   assert.ok(!/\$\s?\d/.test(text), 'found a price on the printing page');
   assert.ok((await page.locator('.product').count()) >= 50, 'expected at least 50 print products');
+});
+
+await step('the printing page scrolls freely and its category chips work', async () => {
+  await page.goto(`${SITE}/printing`, { waitUntil: 'networkidle' });
+  // A real mouse wheel, down through several categories. Nothing may push back.
+  await page.mouse.move(640, 430);
+  for (let i = 0; i < 20; i++) {
+    await page.mouse.wheel(0, 300);
+    await page.waitForTimeout(100);
+  }
+  const wheeled = await settled(page);
+  assert.ok(wheeled >= 5900, `wheel-scrolling 6000px only moved the page ${wheeled}px`);
+
+  // Each chip takes you to its category and lights up.
+  for (const hash of ['#marketing', '#apparel', '#promo']) {
+    const chip = await page.locator(`.cat-nav__link[href="${hash}"]`).boundingBox();
+    await page.mouse.click(chip.x + chip.width / 2, chip.y + chip.height / 2);
+    await settled(page);
+    await page.waitForTimeout(300);
+    const seen = await categoryOnScreen(page, hash);
+    assert.ok(seen.headingTop >= seen.barBottom && seen.headingTop < 430,
+      `${hash}: its heading is ${seen.headingTop}px down the screen (the category bar ends at ${seen.barBottom}px)`);
+    assert.equal(seen.active, hash, `${hash}: the highlighted chip is ${seen.active}`);
+  }
+
+  // Keyboard focus landing in the sticky header must not move the page.
+  const before = await settled(page);
+  await page.evaluate(() => document.querySelector('.site-nav__link').focus());
+  await page.waitForTimeout(700);
+  assert.equal(await settled(page), before, 'focusing a link in the header moved the page');
 });
 
 await step('website and booking prices are shown', async () => {
@@ -396,6 +455,74 @@ await step('no browser errors or blocked requests along the way', async () => {
 });
 
 console.log('\nPhone');
+
+await step('on a phone, the printing page scrolls by touch and its chips work', async () => {
+  const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const mobile = await phone.newPage();
+  const touch = await phone.newCDPSession(mobile);
+  // A finger dragged across the screen, sent as real touch events.
+  const drag = async (from, to) => {
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [from] });
+    for (let i = 1; i <= 12; i++) {
+      await touch.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: from.x + ((to.x - from.x) * i) / 12, y: from.y + ((to.y - from.y) * i) / 12 }] });
+      await mobile.waitForTimeout(16);
+    }
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  };
+  await mobile.goto(`${SITE}/printing`, { waitUntil: 'networkidle' });
+
+  // Six drags up the screen, through several categories: every one must count.
+  let at = 0;
+  for (let i = 1; i <= 6; i++) {
+    await drag({ x: 195, y: 700 }, { x: 195, y: 160 });
+    const now = await settled(mobile);
+    assert.ok(now - at >= 400, `finger drag ${i} (540px) only moved the page ${now - at}px`);
+    at = now;
+  }
+
+  // The chip row slides sideways under a finger without moving the page.
+  await mobile.evaluate(() => window.scrollTo({ top: 1000, behavior: 'instant' }));
+  await mobile.waitForTimeout(600);
+  const bar = await mobile.locator('.cat-nav').boundingBox();
+  const rowBefore = await mobile.evaluate(() => document.querySelector('.cat-nav__list').scrollLeft);
+  await drag({ x: 330, y: bar.y + bar.height / 2 }, { x: 70, y: bar.y + bar.height / 2 });
+  await mobile.waitForTimeout(700);
+  const rowAfter = await mobile.evaluate(() => document.querySelector('.cat-nav__list').scrollLeft);
+  assert.ok(rowAfter - rowBefore > 100, `the chip row did not slide sideways (moved ${Math.round(rowAfter - rowBefore)}px)`);
+  assert.equal(await settled(mobile), 1000, 'sliding the chip row moved the page');
+
+  // Tapping a chip that is on screen takes you to that category.
+  const target = await mobile.evaluate(() => {
+    for (const link of document.querySelectorAll('.cat-nav__link:not(.is-active)')) {
+      const box = link.getBoundingClientRect();
+      const x = box.left + box.width / 2;
+      if (x > 40 && x < window.innerWidth - 40) return { hash: link.hash, x, y: box.top + box.height / 2 };
+    }
+    return null;
+  });
+  assert.ok(target, 'no chip on screen to tap');
+  await mobile.touchscreen.tap(target.x, target.y);
+  await settled(mobile);
+  await mobile.waitForTimeout(500);
+  const seen = await categoryOnScreen(mobile, target.hash);
+  assert.ok(seen.headingTop >= seen.barBottom && seen.headingTop < 500,
+    `${target.hash}: its heading is ${seen.headingTop}px down the screen (the category bar ends at ${seen.barBottom}px)`);
+  assert.equal(seen.active, target.hash, `${target.hash}: the highlighted chip is ${seen.active}`);
+  assert.ok(seen.chipInView, 'the highlighted chip is not visible in the row');
+  await phone.close();
+});
+
+await step('nothing is wider than the screen on a small phone', async () => {
+  const small = await browser.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true });
+  const tiny = await small.newPage();
+  for (const path of ['/', '/printing', '/websites', '/booking', '/software', '/contact', '/get-started', '/portal']) {
+    await tiny.goto(SITE + path, { waitUntil: 'networkidle' });
+    if (path === '/booking') await tiny.locator('details.compare > summary').click(); // the widest thing on the site
+    const width = await tiny.evaluate(() => document.documentElement.scrollWidth);
+    assert.ok(width <= 320, `${path} is ${width}px wide on a 320px screen`);
+  }
+  await small.close();
+});
 
 await step('the menu and message form work at phone size', async () => {
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });

@@ -28,10 +28,12 @@ if (navToggle && nav) {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && nav.classList.contains('is-open')) {
       setOpen(false);
-      navToggle.focus();
+      navToggle.focus({ preventScroll: true });
     }
   });
-  window.matchMedia('(min-width: 961px)').addEventListener('change', (query) => query.matches && setOpen(false));
+  // Same width as the stylesheet's switch to the desktop menu: leaving the phone
+  // layout closes the menu, so the page is never left locked behind it.
+  window.matchMedia('(min-width: 1001px)').addEventListener('change', (query) => query.matches && setOpen(false));
 }
 
 /* ── Message pop-up ─────────────────────────────────────────────────────── */
@@ -134,8 +136,23 @@ if (motionOk && 'IntersectionObserver' in window) {
 /* ── Category chips on the printing page ────────────────────────────────── */
 
 const catLinks = $$('.cat-nav__link');
-if (catLinks.length && 'IntersectionObserver' in window) {
+const catList = $('.cat-nav__list');
+if (catLinks.length && catList && 'IntersectionObserver' in window) {
   const byId = new Map(catLinks.map((link) => [link.hash.slice(1), link]));
+
+  // Slide the row of chips sideways so the highlighted one is in view.
+  // This must only ever move the row itself. (`scrollIntoView` also scrolls
+  // the page, and here that dragged the whole page back every time a new
+  // category came into view — which made the page feel stuck and stopped the
+  // chips from taking you anywhere.)
+  const showChip = (link) => {
+    if (catList.scrollWidth <= catList.clientWidth) return; // every chip already fits
+    const row = catList.getBoundingClientRect();
+    const chip = link.getBoundingClientRect();
+    const offset = chip.left + chip.width / 2 - (row.left + row.width / 2);
+    catList.scrollTo({ left: catList.scrollLeft + offset, behavior: motionOk ? 'smooth' : 'auto' });
+  };
+
   const spy = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -144,7 +161,7 @@ if (catLinks.length && 'IntersectionObserver' in window) {
         const active = byId.get(entry.target.id);
         if (active) {
           active.classList.add('is-active');
-          active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: motionOk ? 'smooth' : 'auto' });
+          showChip(active);
         }
       }
     },

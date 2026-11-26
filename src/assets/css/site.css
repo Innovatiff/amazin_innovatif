@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Innovatif — site styles
+   Amazing Innovatif — site styles
 
    Design rules this file follows:
    • One typeface (Inter). Headlines are huge, tight and heavy; body text is
@@ -18,7 +18,7 @@
   font-display: swap;
   src: url('/assets/fonts/inter-latin-opsz-normal.woff2') format('woff2');
 }
-/* Only used for the "Innovatif" wordmark next to the logo. */
+/* Only used for the business name next to the logo. */
 @font-face {
   font-family: 'Poppins';
   font-weight: 600;
@@ -66,6 +66,7 @@
   --radius: 20px;
   --radius-lg: 32px;
   --header: 56px;
+  --cat-nav: 4.05rem; /* height of the sticky category bar on the printing page */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -85,7 +86,6 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header) + 5rem);
   /* Sideways clipping belongs here, not on <body>. On <body> it turns the body
      into its own scrolling box the moment the menu locks the page, and the
      sticky header (with the menu inside it) jumps back to the top of the page. */
@@ -105,6 +105,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* Where a "#link" stops, so the sticky header doesn't cover what you jumped to.
+   This is set on each target (scroll-margin) and deliberately NOT as
+   scroll-padding on the page. Page-level padding also applies to the sticky
+   header and category bar themselves: the browser then treats anything focused
+   inside them as "out of view" and yanks the whole page upward. */
+[id] { scroll-margin-top: calc(var(--header) + 1.5rem); }
 
 /* The hidden attribute always wins, whatever display a component sets. */
 [hidden] { display: none !important; }
@@ -400,8 +407,10 @@ strong { font-weight: 650; }
   font-weight: 600;
   letter-spacing: -0.02em;
   text-decoration: none;
+  white-space: nowrap; /* the name never breaks onto two lines */
+  flex: none;
 }
-/* The Innovatif chevron, drawn exactly like the original logo mark. */
+/* The logo chevron, drawn exactly like the original logo mark. */
 .brand__mark {
   width: 1.45rem; height: 1.18rem;
   background: linear-gradient(180deg, #fff, #9a9a9f);
@@ -418,6 +427,7 @@ strong { font-weight: 650; }
   font-weight: 450;
   letter-spacing: -0.01em;
   text-decoration: none;
+  white-space: nowrap;
   transition: color 0.2s;
 }
 .site-nav__link:hover, .site-nav__link[aria-current='page'] { color: #fff; }
@@ -462,12 +472,18 @@ strong { font-weight: 650; }
 .nav-toggle[aria-expanded='true'] .nav-toggle__bars::before { transform: translateY(4px) rotate(45deg); }
 .nav-toggle[aria-expanded='true'] .nav-toggle__bars::after { transform: translateY(-4px) rotate(-45deg); }
 
-@media (max-width: 900px) {
-  .nav-toggle { display: grid; }
-  .header-cta { display: none; }
+/* Until there is room for the name, the menu, the phone number and the button
+   side by side, the phone number shrinks to its icon… */
+@media (max-width: 1180px) {
   .header-phone span { display: none; }
   .header-phone { width: 2.5rem; height: 2.5rem; justify-content: center; }
   .header-phone .icon { width: 1.2rem; height: 1.2rem; }
+}
+/* …and below this width the menu moves behind the ☰ button. (site.js closes
+   the menu at the same width — keep the two numbers in step.) */
+@media (max-width: 1000px) {
+  .nav-toggle { display: grid; }
+  .header-cta { display: none; }
   /* Positioned from the header rather than the viewport: the header's blur
      makes it the anchor for fixed children, which would squash the menu. */
   .site-nav {
@@ -513,6 +529,11 @@ strong { font-weight: 650; }
 }
 .section--tight { padding-block: calc(var(--section) * 0.55); }
 .section--flush-top { padding-top: 0; }
+/* Jumping to a section lands its first line 4.5rem under the header, whatever
+   padding the section has (see "[id]" near the top of this file). */
+.section[id] { scroll-margin-top: calc(var(--header) + 4.5rem - var(--section)); }
+.section--tight[id] { scroll-margin-top: calc(var(--header) + 4.5rem - var(--section) * 0.55); }
+.section--flush-top[id] { scroll-margin-top: calc(var(--header) + 4.5rem); }
 
 .section-head {
   display: grid;
@@ -748,6 +769,8 @@ strong { font-weight: 650; }
 }
 @media (max-width: 420px) {
   .door { padding-inline: 0.75rem; }
+  /* Scale the big number with the screen so "100,000+" always fits its card. */
+  .door__big { font-size: clamp(1.5rem, 8.4vw, 2.25rem); }
   .door__label { font-size: 0.9375rem; }
 }
 
@@ -1162,7 +1185,12 @@ strong { font-weight: 650; }
 .cat-nav__link:hover { background: rgb(255 255 255 / 0.1); color: #fff; }
 .cat-nav__link.is-active { background: var(--accent); color: #000; }
 
-.category { padding-block: clamp(5rem, 10vw, 9rem); }
+.category {
+  --pad: clamp(5rem, 10vw, 9rem);
+  padding-block: var(--pad);
+  /* A chip lands its category with the picture tile 2.5rem under the bar. */
+  scroll-margin-top: calc(var(--header) + var(--cat-nav) + 2.5rem - var(--pad));
+}
 .category + .category { border-top: 1px solid var(--line); }
 .category__head {
   display: grid;
@@ -1183,7 +1211,7 @@ strong { font-weight: 650; }
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  scroll-margin-top: calc(var(--header) + 5.5rem);
+  scroll-margin-top: calc(var(--header) + var(--cat-nav) + 1.5rem);
 }
 .product__media {
   aspect-ratio: 4 / 3;
@@ -1358,7 +1386,9 @@ strong { font-weight: 650; }
 .compare > summary::-webkit-details-marker { display: none; }
 .compare > summary .icon { transition: transform 0.3s var(--ease); }
 .compare[open] > summary .icon { transform: rotate(45deg); }
-.compare__scroll { overflow-x: auto; border-top: 1px solid var(--line); }
+/* `position: relative` keeps the table's hidden screen-reader labels inside this
+   scrolling box; without it they count towards the width of the whole page. */
+.compare__scroll { position: relative; overflow-x: auto; border-top: 1px solid var(--line); }
 .compare table { min-width: 640px; }
 .compare th, .compare td { padding: 0.9rem 1.25rem; border-bottom: 1px solid var(--line); font-size: 1rem; text-align: center; }
 .compare th:first-child, .compare td:first-child { padding-left: clamp(1.5rem, 3vw, 2.25rem); color: #e8e8ed; text-align: left; }
@@ -1385,8 +1415,9 @@ strong { font-weight: 650; }
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(2.5rem, 7vw, 6rem);
   align-items: center;
-  padding-block: clamp(4rem, 9vw, 8rem);
-  scroll-margin-top: var(--header);
+  --pad: clamp(4rem, 9vw, 8rem);
+  padding-block: var(--pad);
+  scroll-margin-top: calc(var(--header) + 4.5rem - var(--pad));
 }
 .feature + .feature { border-top: 1px solid var(--line); }
 .feature:nth-child(even) .feature__media { order: 2; }
@@ -1744,7 +1775,7 @@ html.has-dialog { overflow: hidden; }
 
 /* ── Booking "get started" form ───────────────────────────────────────── */
 
-.wizard { max-width: 46rem; margin-inline: auto; }
+.wizard { max-width: 46rem; margin-inline: auto; scroll-margin-top: calc(var(--header) + 1.5rem); }
 .wizard__progress { display: flex; gap: 0.4rem; margin-bottom: 2.5rem; }
 .wizard__progress span { flex: 1; height: 5px; border-radius: 5px; background: var(--surface-3); }
 .wizard__progress span.is-done { background: linear-gradient(90deg, rgb(var(--accent-rgb)), rgb(var(--accent-2-rgb))); }

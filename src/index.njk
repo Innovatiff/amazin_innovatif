@@ -4,8 +4,9 @@ permalink: /index.html
 key: home
 accent: neutral
 backdrop: aurora
-title: Innovatif — Printing, websites, booking systems and software for business
-description: Innovatif is the all-in-one agency for local businesses — marketing print, websites from $49.99/month, online booking systems and custom software, handled by one team.
+title: Printing, websites, booking systems and software for business
+eleventyComputed:
+  description: "{{ site.name }} is the all-in-one agency for local businesses — marketing print, websites from $49.99/month, online booking systems and custom software, handled by one team."
 ---
 {% import "ui.njk" as ui %}
 
@@ -181,7 +182,7 @@ description: Innovatif is the all-in-one agency for local businesses — marketi
 <section class="section" id="why">
   <div class="container">
     <header class="section-head">
-      <p class="eyebrow">Why Innovatif</p>
+      <p class="eyebrow">Why {{ site.name }}</p>
       <h2><span class="nb">One team.</span> <span class="nb">One look.</span> <span class="grad nb">One call.</span></h2>
       <p class="lead">Most businesses juggle a printer, a web designer and a software company. With us it’s one conversation — and everything matches.</p>
     </header>

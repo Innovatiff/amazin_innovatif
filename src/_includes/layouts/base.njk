@@ -4,7 +4,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>{{ title }}</title>
+    {#- A page's `title` is just its own words; the business name is added here. -#}
+    {% set pageTitle = (site.name + ' — ' + title) if key == 'home' else (title + ' | ' + site.name) %}
+    <title>{{ pageTitle }}</title>
     <meta name="description" content="{{ description }}">
     <meta name="theme-color" content="#000000">
     <meta name="color-scheme" content="dark">
@@ -13,7 +15,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ site.name }}">
-    <meta property="og:title" content="{{ title }}">
+    <meta property="og:title" content="{{ pageTitle }}">
     <meta property="og:description" content="{{ description }}">
     {% if site.url %}
     <meta property="og:url" content="{{ site.url }}{{ page.url | replace('.html', '') }}">

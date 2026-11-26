@@ -4,8 +4,9 @@ permalink: /contact.html
 key: contact
 accent: neutral
 backdrop: aurora
-title: Contact Innovatif — call, WhatsApp or send a message
-description: Get a quote for printing, a website, a booking system or custom software. Call, WhatsApp or send Innovatif a message and we’ll get back to you.
+title: Contact us — call, WhatsApp or send a message
+eleventyComputed:
+  description: "Get a quote for printing, a website, a booking system or custom software. Call, WhatsApp or send {{ site.name }} a message and we’ll get back to you."
 ---
 {% import "ui.njk" as ui %}
 
@@ -70,7 +71,7 @@ description: Get a quote for printing, a website, a booking system or custom sof
           is filled in, the list is already as tall as the form, so it is left out. -#}
       {% set details = (1 if site.phone else 0) + (1 if site.whatsapp else 0) + (1 if site.email else 0) + (1 if site.address else 0) + (1 if site.hours else 0) %}
       {% if details <= 3 -%}
-      <figure>{{ ui.img('general/chat-support', 'A customer chatting with Innovatif about a print quote', '(min-width: 900px) 40vw, 94vw') }}</figure>
+      <figure>{{ ui.img('general/chat-support', 'A customer chatting with ' + site.name + ' about a print quote', '(min-width: 900px) 40vw, 94vw') }}</figure>
       {%- endif %}
     </div>
 
