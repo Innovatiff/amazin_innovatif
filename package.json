@@ -1,0 +1,14 @@
+{
+  "name": "innovatif",
+  "version": "1.0.0",
+  "description": "Landpage for Innovatif ",
+  "main": "index.js",
+  "scripts": {
+    "watch": "sass src/sass/main.scss style.css -w"
+  },
+  "author": "Innovatif developments",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.72.0"
+  }
+}

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2"></script>
+    <script type="module" src="/src/js/leadform.js"></script>
+    <link rel="icon" href="src/img/favicon.png" />
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <title>Innovatif &mdash; trace your nearest assistant</title>
+  </head>
+  <body>
+    <div class="nav__border"></div>
+    <div class="home">
+      <div class="header__back">
+        <header class="header">
+          <nav class="header__nav">
+            <a href="#" class="header__nav--logo">
+              <img src="src/img/logo-remove.png" alt="logo link" class="header__nav--link-logo" />
+            </a>
+            <div class="header__nav--links">
+              <a href="home.html" class="header__nav--link">Home</a>
+              <!-- <a href="card.html" class="header__nav--link">Designs</a> -->
+              <a href="customers.html" class="header__nav--link">Sample</a>
+              <a href="pricing.html" class="header__nav--link header__nav--link-down">Pricing </a>
+              <a href="contact.html" class="header__nav--link header__nav--link-active">Contact</a>
+            </div>
+            <div class="header__nav--logs">
+              <div class="header__nav--logs-b">
+                <a href="designs.html" class="header__nav--log header__nav--sign">Request Demo</a>
+              </div>
+              <button class="header__nav--logs-devices">
+                <div class="header__nav--logs-devices-b header__nav--logs-devices-b-1"></div>
+                <div class="header__nav--logs-devices-b header__nav--logs-devices-b-2"></div>
+              </button>
+            </div>
+          </nav>
+          <div class="header__phone">
+            <div class="header__phone--container">
+              <div class="header__phone--links">
+                <a href="home.html" class="header__phone--link">Home</a>
+                <a href="software.html" class="header__phone--link">Lightscale</a>
+                <a href="assistants.html" class="header__phone--link">Assistants</a>
+
+                <a href="customers.html" class="header__phone--link">Customers</a>
+                <a href="web-marketing.html" class="header__phone--link header__phone--link-pricing"
+                  >Pricing</a
+                >
+                <a href="contact.html" class="header__phone--link">Contact</a>
+                <a href="designs.html" class="header__phone--link">Designs</a>
+              </div>
+            </div>
+          </div>
+        </header>
+      </div>
+
+      <main class="main">
+        <section class="form">
+          <div class="form__container">
+            <div class="form__header">
+              <h1 class="heading--primary">Let's Build Your Booking System</h1>
+              <!-- <span class="normal--text"
+                >Answer a few quick questions so we can understand your business.</span
+              > -->
+            </div>
+            <div class="form__guide">
+              <div class="form__guide--box form__guide--box-active">
+                <span class="form__guide--box-number">1</span>
+                <!-- <p class="form__guide--box-step">Personal Information</p> -->
+              </div>
+              <div class="form__guide--line"></div>
+              <div class="form__guide--box">
+                <span class="form__guide--box-number">2</span>
+                <!-- <p class="form__guide--box-step">Business Information</p>-->
+              </div>
+              <div class="form__guide--line"></div>
+              <div class="form__guide--box">
+                <span class="form__guide--box-number">3</span>
+                <!-- <p class="form__guide--box-step">Desired Plan</p>-->
+              </div>
+              <div class="form__guide--line"></div>
+              <div class="form__guide--box">
+                <span class="form__guide--box-number">4</span>
+                <!-- <p class="form__guide--box-step">Goal</p>-->
+              </div>
+              <div class="form__guide--line"></div>
+              <div class="form__guide--box">
+                <span class="form__guide--box-number">5</span>
+                <!-- <p class="form__guide--box-step">Reserve Your Spot</p>-->
+              </div>
+            </div>
+            <div class="form__content">
+              <div class="form__layouts">
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">What is your name?</span>
+                  <input class="form__layouts--box-input" type="text" placeholder="Your full name" />
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">Enter your phone number?</span>
+                  <input class="form__layouts--box-input" type="text" placeholder="Your phone number" />
+                  <p class="form__layouts--box-text">
+                    We’ll use this to contact you about your booking system.
+                  </p>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">What is your email address?</span>
+                  <input class="form__layouts--box-input" type="email" placeholder="Email address" />
+                  <p class="form__layouts--box-text">
+                    <i class="ph-fill ph-arrow-right"></i>
+
+                    We’ll send your next steps and project details here.
+                  </p>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">What is your business name?</span>
+                  <input class="form__layouts--box-input" type="text" placeholder="Business name" />
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">What type of business do you run?</span>
+                  <select class="form__layouts--box-input" name="business__type" id="business__type">
+                    <option value="Cleaner">Cleaner</option>
+                    <option value="Mobile Detailer">Mobile Detailer</option>
+                    <option value="Barber">Barber</option>
+                    <option value="Beauty Service">Beauty Service</option>
+                    <option value="Home Service">Home Service</option>
+                    <option value="Appointment-Based Business">Appointment-Based Business</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  <input
+                    class="form__layouts--box-input form__layouts--box-input-specific"
+                    type="text"
+                    placeholder="Be specific"
+                  />
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">What town or city do you serve?</span>
+                  <input class="form__layouts--box-input" type="text" placeholder="City / Town" />
+                  <p class="form__layouts--box-text">
+                    <i class="ph-fill ph-arrow-right"></i>
+
+                    This helps us check category availability in your area.
+                  </p>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">Do you already have a website?</span>
+                  <select class="form__layouts--box-input" name="website__status" id="website__status">
+                    <option value="1">No, I only use social media</option>
+                    <option value="2">Yes, but it needs improvement</option>
+                    <option value="3">Yes, and I want to add booking</option>
+                    <option value="4">Not sure</option>
+                  </select>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">Which plan are you interested in?</span>
+                  <div class="form__layouts--box-plans">
+                    <div class="form__layouts--box-plans-box form__layouts--box-plans-box-active">
+                      <div class="form__layouts--box-plans-box-top">
+                        <div
+                          class="form__layouts--box-plans-box-top-opt form__layouts--box-plans-box-top-opt-active"
+                        ></div>
+                        <span class="form__layouts--box-plans-box-top-title"> Starter </span>
+                        <span class="form__layouts--box-plans-box-top-cost">$497 Setup + 149/Month</span>
+                      </div>
+                      <span class="form__layouts--box-plans-box-description"
+                        >Simple online booking system for small businesses.</span
+                      >
+                    </div>
+                    <div class="form__layouts--box-plans-box form__layouts--box-plans-box-sp">
+                      <div class="form__layouts--box-plans-box-top">
+                        <div class="form__layouts--box-plans-box-top-opt"></div>
+                        <span
+                          class="form__layouts--box-plans-box-top-title form__layouts--box-plans-box-top-title-sp"
+                        >
+                          Pro
+                        </span>
+                        <span
+                          class="form__layouts--box-plans-box-top-cost form__layouts--box-plans-box-top-cost-sp"
+                          >$997 setup + $299/month</span
+                        >
+                      </div>
+                      <span
+                        class="form__layouts--box-plans-box-description form__layouts--box-plans-box-description-sp"
+                        >Full website, booking system, dashboard, mobile stats, emails, reviews, and social
+                        media launch kit.</span
+                      >
+                    </div>
+                    <div class="form__layouts--box-plans-box">
+                      <div class="form__layouts--box-plans-box-top">
+                        <div class="form__layouts--box-plans-box-top-opt"></div>
+                        <span class="form__layouts--box-plans-box-top-title"> Elite </span>
+                        <span class="form__layouts--box-plans-box-top-cost">$1,997 setup + $499/month</span>
+                      </div>
+                      <span class="form__layouts--box-plans-box-description"
+                        >Premium system with advanced features, priority support, and growth tools.</span
+                      >
+                    </div>
+                    <div style="grid-column: 1 / -1" class="form__layouts--box-plans-box">
+                      <div class="form__layouts--box-plans-box-top">
+                        <div class="form__layouts--box-plans-box-top-opt"></div>
+                        <span class="form__layouts--box-plans-box-top-title"> Not sure</span>
+                        <span class="form__layouts--box-plans-box-top-cost">Help me choose</span>
+                      </div>
+                      <span class="form__layouts--box-plans-box-description"
+                        >We'll Contact you and help you choose the best plan tailored to your needs.</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">What is your main goal right now?</span>
+                  <div class="form__layouts--box-choose">
+                    <div class="form__layouts--box-choose-box form__layouts--box-choose-box-active">
+                      <span>Get more bookings</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Look more professional</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Stop losing customers in DMs</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Track bookings better</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Collect more reviews</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Make booking easier for customers</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question"
+                    >What is your biggest problem with bookings right now?</span
+                  >
+                  <div class="form__layouts--box-choose">
+                    <div class="form__layouts--box-choose-box form__layouts--box-choose-box-active">
+                      <span>Too many DMs</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Slow replies</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>No clear booking process</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>No website</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>No dashboard</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>Customers ask questions but don’t book</span>
+                    </div>
+                    <div class="form__layouts--box-choose-box">
+                      <span>I’m not getting enough leads</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">Ready to reserve your spot?</span>
+                  <p class="form__layouts--box-text">
+                    We only accept one business per category per town. Your deposit reserves your spot and
+                    goes toward your setup fee.
+                  </p>
+                  <div class="form__layouts--box-options">
+                    <div class="form__layouts--box-options-box form__layouts--box-options-box-active">
+                      <div class="form__layouts--box-options-box-top">
+                        <div
+                          class="form__layouts--box-options-box-top-opt form__layouts--box-options-box-top-opt-active"
+                        ></div>
+                        <span class="form__layouts--box-options-box-top-title">Reserve my spot</span>
+                        <span class="form__layouts--box-options-box-top-cost">$97</span>
+                      </div>
+                      <span class="form__layouts--box-options-box-description"
+                        >A deposit to reserve your category spot and start your booking system setup.</span
+                      >
+                    </div>
+                    <div class="form__layouts--box-options-box">
+                      <div class="form__layouts--box-options-box-top">
+                        <div class="form__layouts--box-options-box-top-opt"></div>
+                        <span class="form__layouts--box-options-box-top-title">Not yet</span>
+                        <span class="form__layouts--box-options-box-top-cost">I want to talk first</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form__layouts--box">
+                  <span class="form__layouts--box-question">You're almost there</span>
+                  <i class="ph ph-spinner form__layouts--box-icon"></i>
+                </div>
+                <div class="form__layouts--box">
+                  <div class="form__layouts--box-question">
+                    <i style="color: #37b24d; font-size: 10rem" class="ph-fill ph-check-circle"></i>
+                    <span style="margin-top: 3rem">Thank you. We received your request.</span>
+                  </div>
+                  <span class="form__layouts--box-text form__layouts--box-text-sp"
+                    >We’ll review your business, check availability in your category and town, and contact you
+                    with the next steps.</span
+                  >
+                </div>
+              </div>
+              <div class="form__btns">
+                <button class="form__btn form__back">
+                  <i class="ph-fill ph-arrow-circle-left"></i>
+                  <span>Back</span>
+                </button>
+                <button class="form__btn form__forward">
+                  <span>Next</span>
+                  <i class="ph-fill ph-arrow-circle-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

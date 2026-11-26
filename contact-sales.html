@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2"></script>
+    <script defer src="/src/js/responsive.js"></script>
+    <script type="module" src="/src/js/contact-sales.js"></script>
+    <link rel="icon" href="src/img/favicon.png" />
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <title>Contact us &mdash; Innovatif</title>
+  </head>
+  <body>
+    <div class="nav__border"></div>
+    <div class="home">
+      <div class="header__back">
+        <header class="header">
+          <nav class="header__nav">
+            <a href="#" class="header__nav--logo">
+              <img src="src/img/logo-remove.png" alt="logo link" class="header__nav--link-logo" />
+            </a>
+            <div class="header__nav--links">
+              <a href="home.html" class="header__nav--link">Home</a>
+              <!-- <a href="card.html" class="header__nav--link">Designs</a> -->
+              <a href="customers.html" class="header__nav--link">Sample</a>
+              <a href="pricing.html" class="header__nav--link header__nav--link-down">Pricing </a>
+              <a href="contact.html" class="header__nav--link header__nav--link-active">Contact</a>
+            </div>
+            <div class="header__nav--logs">
+              <div class="header__nav--logs-b">
+                <a href="designs.html" class="header__nav--log header__nav--sign">Request Demo</a>
+              </div>
+              <button class="header__nav--logs-devices">
+                <div class="header__nav--logs-devices-b header__nav--logs-devices-b-1"></div>
+                <div class="header__nav--logs-devices-b header__nav--logs-devices-b-2"></div>
+              </button>
+            </div>
+          </nav>
+          <div class="header__phone">
+            <div class="header__phone--container">
+              <div class="header__phone--links">
+                <a href="home.html" class="header__phone--link">Home</a>
+                <a href="software.html" class="header__phone--link">Lightscale</a>
+                <a href="assistants.html" class="header__phone--link">Assistants</a>
+
+                <a href="customers.html" class="header__phone--link">Customers</a>
+                <a href="web-marketing.html" class="header__phone--link header__phone--link-pricing"
+                  >Pricing</a
+                >
+                <a href="contact.html" class="header__phone--link">Contact</a>
+                <a href="designs.html" class="header__phone--link">Designs</a>
+              </div>
+            </div>
+          </div>
+        </header>
+      </div>
+
+      <main class="main">
+        <section class="contact-sales">
+          <div class="contact-sales__container">
+            <div class="contact-sales__left">
+              <h2 class="contact-sales__left--heading">Contact our team</h2>
+              <ul class="contact-sales__left--list">
+                <li class="contact-sales__left--list-details">
+                  <ion-icon class="contact-sales__left--list-details-icon" name="checkmark-circle"></ion-icon>
+                  <span class="contact-sales__left--list-details-text">Any Concerns</span>
+                </li>
+                <li class="contact-sales__left--list-details">
+                  <ion-icon class="contact-sales__left--list-details-icon" name="checkmark-circle"></ion-icon>
+                  <span class="contact-sales__left--list-details-text">Learn which plan is best for you</span>
+                </li>
+                <li class="contact-sales__left--list-details">
+                  <ion-icon class="contact-sales__left--list-details-icon" name="checkmark-circle"></ion-icon>
+                  <span class="contact-sales__left--list-details-text">Tell us exactly what you want</span>
+                </li>
+              </ul>
+              <span class="contact-sales__left--other">Get your booking system</span>
+              <a href="form.html" class="contact-sales__left--link"
+                >Get started<ion-icon name="chevron-forward"></ion-icon
+              ></a>
+            </div>
+            <div class="contact-sales__right">
+              <div class="contact-sales__right--top">
+                <span>Tell us how we can help</span>
+              </div>
+              <form class="contact-sales__right--fill">
+                <div class="contact-sales__right--fill-box">
+                  <label
+                    for="contact-sales__right--fill-box-input"
+                    class="contact-sales__right--fill-box-label"
+                    >Full name</label
+                  >
+                  <input
+                    class="contact-sales__right--fill-box-input"
+                    type="text"
+                    placeholder="James Browns"
+                    name="name"
+                    required
+                  />
+                </div>
+                <div class="contact-sales__right--fill-box">
+                  <label
+                    for="contact-sales__right--fill-box-input"
+                    class="contact-sales__right--fill-box-label"
+                    >Email</label
+                  >
+                  <input
+                    class="contact-sales__right--fill-box-input"
+                    type="email"
+                    placeholder="James@hotmail.com"
+                    name="email"
+                    required
+                  />
+                </div>
+                <div class="contact-sales__right--fill-box">
+                  <label
+                    for="contact-sales__right--fill-box-input"
+                    class="contact-sales__right--fill-box-label"
+                    >Your enquiry</label
+                  >
+                  <select class="contact-sales__right--fill-box-select" name="enquiry" id="enquiry" required>
+                    <option class="contact-sales__right--fill-box-opt" value="">Choose your enquiry</option>
+                    <option class="contact-sales__right--fill-box-opt" value="Plans">Plans</option>
+                    <option class="contact-sales__right--fill-box-opt" value="Service">Services</option>
+                    <option class="contact-sales__right--fill-box-opt" value="Report">Report</option>
+                    <option class="contact-sales__right--fill-box-opt" value="Questions">Questions</option>
+                  </select>
+                </div>
+                <div class="contact-sales__right--fill-box">
+                  <label
+                    for="contact-sales__right--fill-box-input"
+                    class="contact-sales__right--fill-box-label"
+                    >How can we help?</label
+                  >
+                  <textarea
+                    class="contact-sales__right--fill-box-textarea"
+                    name="message"
+                    placeholder="Please tell us how we can help you"
+                    required
+                  ></textarea>
+                </div>
+                <div class="contact-sales__right--fill-bottom">
+                  <span class="contact-sales__right--fill-text"
+                    >Sit tight, an agent will respond shortly</span
+                  >
+                  <button type="submit" class="contact-sales__right--fill-btn">
+                    <span>Send message</span>
+                    <i class="ph-fill ph-arrow-circle-right"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
