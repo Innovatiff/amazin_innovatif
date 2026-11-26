@@ -1,0 +1,13 @@
+{% import "ui.njk" as ui %}
+{# Closing call-to-action. Set ctaTitle / ctaText / ctaService before including. #}
+<section class="section cta">
+  <div class="container">
+    <div class="cta__panel">
+      <div class="cta__glow" aria-hidden="true"></div>
+      <h2>{{ ctaTitle or 'Ready when you are' }}</h2>
+      <p class="lead">{% if ctaText %}{{ ctaText }}{% elif site.phone or site.whatsapp %}Tell us what you need and we’ll take it from there. A call, a WhatsApp or a quick message — whichever is easiest for you.{% else %}Tell us what you need and we’ll take it from there. Send a quick message and we’ll get right back to you.{% endif %}</p>
+      {{ ui.contact(site, service=ctaService, label=(ctaLabel or 'Send a message')) }}
+      {% if not site.phone and not site.whatsapp %}<p class="cta__note">Prefer to talk? Leave your number in the message and we’ll call you back.</p>{% endif %}
+    </div>
+  </div>
+</section>

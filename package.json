@@ -1,0 +1,30 @@
+{
+  "name": "innovatif-site",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Innovatif \u2014 print, websites, online booking and custom software for business.",
+  "type": "module",
+  "scripts": {
+    "dev": "eleventy --serve --port 8080",
+    "build": "eleventy",
+    "emulators": "npm run build && firebase emulators:start --project demo-innovatif",
+    "test": "firebase emulators:exec --only firestore --project demo-innovatif \"node --test tests/firestore.rules.test.mjs\"",
+    "test:e2e": "npm run build && firebase emulators:exec --project demo-innovatif \"node tests/e2e.mjs\"",
+    "images": "node scripts/optimize-images.mjs",
+    "icons": "node scripts/build-icons.mjs",
+    "deploy": "firebase deploy",
+    "deploy:site": "firebase deploy --only hosting"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.8",
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@phosphor-icons/core": "^2.1.1",
+    "firebase": "^13.4.0",
+    "firebase-tools": "^15.37.0",
+    "playwright": "^1.63.0",
+    "sharp": "^0.35.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,62 @@
+{% import "ui.njk" as ui %}
+{# Pages that are themselves a form don't need a floating "message" button. #}
+{% set dockMessage = key != 'contact' and key != 'get-started' %}
+{% set dock = dockMessage or site.phone or site.whatsapp %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="color-scheme" content="dark">
+    {% if noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+    {% if site.url %}<link rel="canonical" href="{{ site.url }}{{ page.url | replace('.html', '') }}">{% endif %}
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ site.name }}">
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ description }}">
+    {% if site.url %}
+    <meta property="og:url" content="{{ site.url }}{{ page.url | replace('.html', '') }}">
+    <meta property="og:image" content="{{ site.url }}/assets/img/hero/{{ shareImage or 'home-hero' }}-1280.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    {% endif %}
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="preload" href="/assets/fonts/poppins-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ '/assets/css/site.css' | bust }}">
+    <script type="module" src="{{ '/assets/js/site.js' | bust }}"></script>
+    {% if pageScript %}<script type="module" src="{{ pageScript | bust }}"></script>{% endif %}
+    {% if key == 'home' -%}
+    {# Tells search engines who this business is and how to reach it. #}
+    <script type="application/ld+json">{{ {
+      '@context': 'https://schema.org',
+      '@type': 'ProfessionalService',
+      name: site.name,
+      description: site.tagline,
+      url: site.url or undefined,
+      telephone: site.phone or undefined,
+      email: site.email or undefined,
+      address: site.address or undefined,
+      openingHours: site.hours or undefined
+    } | json | safe }}</script>
+    {%- endif %}
+  </head>
+  <body data-accent="{{ accent or 'neutral' }}" data-page="{{ key }}"{% if dock %} data-dock{% endif %}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    {% include "partials/header.njk" %}
+    <main id="main">
+      {{ content | safe }}
+    </main>
+    {% include "partials/footer.njk" %}
+    {% include "partials/quote-dialog.njk" %}
+    {% include "partials/dock.njk" %}
+  </body>
+</html>

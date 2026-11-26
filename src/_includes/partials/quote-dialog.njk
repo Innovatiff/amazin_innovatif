@@ -1,0 +1,14 @@
+{% import "ui.njk" as ui %}
+<dialog class="dialog" id="quote-dialog" aria-labelledby="quote-dialog-title">
+  <div class="dialog__panel">
+    <header class="dialog__head">
+      <div>
+        <h2 id="quote-dialog-title">Tell us what you need</h2>
+        <p>We’ll come back with a quote or the answers you’re after.</p>
+      </div>
+      <button class="icon-button" type="button" data-dialog-close aria-label="Close">{{ ui.icon('x') }}</button>
+    </header>
+    {% set formId = 'q' %}
+    {% include "partials/lead-form.njk" %}
+  </div>
+</dialog>

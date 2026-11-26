@@ -1,0 +1,82 @@
+{% import "ui.njk" as ui %}
+{#
+  The message form. It appears in the pop-up on every page and on /contact.
+  Submissions are saved to the "Contact" collection in Firestore and show up
+  in the manager portal. `formId` keeps field ids unique when the page has
+  both the pop-up and the inline form.
+#}
+<form class="lead-form" data-lead-form novalidate>
+  <div class="lead-form__fields">
+    <div class="field">
+      <label for="{{ formId }}-name">Your name</label>
+      <input id="{{ formId }}-name" name="name" type="text" autocomplete="name" maxlength="100" required>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="{{ formId }}-phone">Phone or WhatsApp</label>
+        <input id="{{ formId }}-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="40">
+      </div>
+      <div class="field">
+        <label for="{{ formId }}-email">Email</label>
+        <input id="{{ formId }}-email" name="email" type="email" autocomplete="email" maxlength="200">
+      </div>
+    </div>
+    <p class="field-hint" data-contact-hint>Leave a phone number or an email — whichever you prefer.</p>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="{{ formId }}-enquiry">What do you need?</label>
+        <select id="{{ formId }}-enquiry" name="enquiry" required>
+          <option value="">Choose a service</option>
+          {% for option in site.enquiries -%}
+          <option value="{{ option.value }}">{{ option.label }}</option>
+          {%- endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="{{ formId }}-product">Product or project <span class="optional">optional</span></label>
+        <input id="{{ formId }}-product" name="product" type="text" maxlength="120" placeholder="e.g. 500 business cards">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="{{ formId }}-message">Tell us a little more</label>
+      <textarea id="{{ formId }}-message" name="message" rows="4" maxlength="4000" required placeholder="Quantity, size, deadline or what you’d like the software to do — anything that helps us quote."></textarea>
+    </div>
+
+    <fieldset class="choice">
+      <legend>How should we reply?</legend>
+      <label><input type="radio" name="preferredContact" value="Call" checked><span>{{ ui.icon('phone') }} Call</span></label>
+      <label><input type="radio" name="preferredContact" value="WhatsApp"><span>{{ ui.icon('whatsapp-logo') }} WhatsApp</span></label>
+      <label><input type="radio" name="preferredContact" value="Email"><span>{{ ui.icon('envelope-simple') }} Email</span></label>
+    </fieldset>
+
+    {# Hidden from people; bots that fill it in are ignored. #}
+    <div class="field-trap" aria-hidden="true">
+      <label for="{{ formId }}-website">Leave this empty</label>
+      <input id="{{ formId }}-website" name="website" type="text" tabindex="-1" autocomplete="off">
+    </div>
+
+    <p class="form-status" role="alert" data-form-status hidden></p>
+
+    <button class="btn btn--primary btn--block" type="submit" data-submit>
+      {{ ui.icon('paper-plane-tilt') }}<span data-submit-label>Send message</span>
+    </button>
+    <p class="lead-form__note">We reply to every message. No spam, ever.</p>
+  </div>
+
+  <div class="lead-form__done" data-form-done hidden tabindex="-1">
+    <div class="lead-form__tick">{{ ui.icon('check') }}</div>
+    <h3>Message received</h3>
+    <p>Thanks<span data-done-name></span> — we’ve got it and we’ll be in touch shortly.</p>
+    {% if site.phone or site.whatsapp -%}
+    <p class="lead-form__faster">Need an answer right now?</p>
+    <div class="actions actions--center">
+      {% if site.phone %}<a class="btn btn--outline btn--sm" href="{{ site.phone | tel }}">{{ ui.icon('phone-fill') }}<span>Call us</span></a>{% endif %}
+      {% if site.whatsapp %}<a class="btn btn--whatsapp btn--sm" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I just sent a message on your website.') }}" target="_blank" rel="noopener">{{ ui.icon('whatsapp-logo-fill') }}<span>WhatsApp</span></a>{% endif %}
+    </div>
+    {%- endif %}
+    <button class="link-button" type="button" data-form-reset>Send another message</button>
+  </div>
+</form>

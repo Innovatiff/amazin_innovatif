@@ -1,0 +1,19 @@
+---
+permalink: /form.html
+eleventyExcludeFromCollections: true
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <title>Redirecting… — {{ site.name }}</title>
+    {# The booking form used to live here. Payment links still return to this
+       address, so pass visitors (and "?payment=success") on to the new page. #}
+    <script src="/assets/js/forward.js"></script>
+    <meta http-equiv="refresh" content="1; url=/get-started">
+  </head>
+  <body>
+    <p><a href="/get-started">Continue to the booking form</a></p>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+---
+layout: layouts/base.njk
+permalink: /printing.html
+key: printing
+accent: print
+shareImage: print-hero
+title: Printing & marketing materials — business cards, banners, shirts, stickers | Innovatif
+description: Business cards, flyers, posters, banners, signs, vehicle wraps, shirts, stickers, labels, vinyl, packaging and promo products. Designed and printed by Innovatif — call, WhatsApp or message for a quote.
+---
+{% import "ui.njk" as ui %}
+
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero__text">
+      {{ ui.eyebrow('Printing & marketing', 'printer') }}
+      <h1>Print that gets your business noticed</h1>
+      <p class="lead">Business cards, posters, banners, shirts, stickers, labels, vinyl, signs, packaging and more. If your brand goes on it, we design it and print it.</p>
+      {{ ui.contact(site, service='Printing', label='Get a print quote') }}
+      <p class="page-hero__note">{{ ui.icon('tag') }}<span>No price lists here — every job is quoted to fit your size, quantity and finish. More info is just a call or a message away.</span></p>
+    </div>
+    <div class="page-hero__media">
+      {{ ui.wide('print-hero', 'A matching set of printed brand materials: cards, letterhead, flyer, stickers, shirt, tote bag, cups, mug and packaging') }}
+    </div>
+  </div>
+</section>
+
+<nav class="cat-nav" aria-label="Print categories">
+  <div class="container">
+    <ul class="cat-nav__list">
+      {% for category in print.categories -%}
+      <li><a class="cat-nav__link" href="#{{ category.id }}">{{ ui.icon(category.icon) }}{{ category.short }}</a></li>
+      {%- endfor %}
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  {% for category in print.categories %}
+  <section class="category" id="{{ category.id }}" aria-labelledby="{{ category.id }}-title">
+    <header class="category__head">
+      <span class="card__icon">{{ ui.icon(category.icon) }}</span>
+      <div>
+        <h2 id="{{ category.id }}-title">{{ category.title }}</h2>
+        <p>{{ category.intro }}</p>
+      </div>
+    </header>
+
+    <div class="grid grid--3 grid--keep-2">
+      {% for product in category.products -%}
+      <article class="product" id="{{ product.id }}">
+        <div class="product__media">{{ ui.img('print/' + product.id, product.name + ' printed by Innovatif', '(min-width: 980px) 380px, (min-width: 620px) 46vw, 46vw') }}</div>
+        <div class="product__body">
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.text }}</p>
+          <ul class="chips">
+            {% for option in product.options %}<li>{{ option }}</li>{% endfor %}
+          </ul>
+          <div class="product__actions">
+            <button class="btn btn--outline btn--sm" type="button" data-quote data-service="Printing" data-product="{{ product.name }}">Get a quote</button>
+            {% if site.whatsapp -%}
+            <a class="icon-button icon-button--whatsapp" href="{{ site.whatsapp | whatsapp('Hi ' + site.name + '! I’d like a quote for ' + product.name + '.') }}" target="_blank" rel="noopener" aria-label="Ask about {{ product.name }} on WhatsApp">{{ ui.icon('whatsapp-logo-fill') }}</a>
+            {%- endif %}
+            {% if site.phone -%}
+            <a class="icon-button" href="{{ site.phone | tel }}" aria-label="Call about {{ product.name }}">{{ ui.icon('phone-fill') }}</a>
+            {%- endif %}
+          </div>
+        </div>
+      </article>
+      {%- endfor %}
+    </div>
+
+    <div class="category__more">
+      <h3>We also print</h3>
+      <ul class="chips chips--lg">
+        {% for item in category.more %}<li>{{ item }}</li>{% endfor %}
+        <li><button class="link-button" type="button" data-quote data-service="Printing">Something else? Ask us</button></li>
+      </ul>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+
+<section class="section" id="design">
+  <div class="container split">
+    <div class="split__text">
+      {{ ui.eyebrow('Design service', 'pen-nib') }}
+      <h2>No design? No problem.</h2>
+      <p class="lead">Bring a logo, a sketch, a photo or just an idea. We design it properly, show you a proof and only print once you’re happy.</p>
+      <ul class="ticks">
+        <li>{{ ui.icon('check') }}<span>Logos and full brand identities</span></li>
+        <li>{{ ui.icon('check') }}<span>Flyers, menus, signs, shirts and packaging artwork</span></li>
+        <li>{{ ui.icon('check') }}<span>Old or blurry logo? We redraw it so it prints sharp at any size</span></li>
+        <li>{{ ui.icon('check') }}<span>One look across your print, website and software</span></li>
+      </ul>
+      {{ ui.contact(site, service='Design', label='Ask about design') }}
+    </div>
+    <div class="split__media">
+      {{ ui.img('general/design-studio', 'A designer working on a logo and brand identity', '(min-width: 900px) 46vw, 94vw') }}
+    </div>
+  </div>
+</section>
+
+<section class="section section--soft" id="how-its-made">
+  <div class="container">
+    <header class="section-head">
+      {{ ui.eyebrow('How it’s made', 'gear') }}
+      <h2>The right method for every job</h2>
+      <p class="lead">Different products need different processes. We choose the one that gives your job the best result for its quantity, material and budget.</p>
+    </header>
+    <div class="gallery gallery--three">
+      <figure>{{ ui.img('general/large-format-printer', 'A wide-format printer producing a colorful banner', '(min-width: 760px) 32vw, 94vw') }}<figcaption>Large-format printing</figcaption></figure>
+      <figure>{{ ui.img('general/screen-printing', 'Screen printing a design onto a black t-shirt', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Screen printing &amp; transfers</figcaption></figure>
+      <figure>{{ ui.img('general/embroidery', 'An embroidery machine stitching a logo onto a cap', '(min-width: 760px) 32vw, 46vw') }}<figcaption>Embroidery</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="process">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Ordering', 'lightning') }}
+      <h2>From idea to in your hands</h2>
+    </header>
+    <ol class="steps steps--4">
+      {% for step in print.steps -%}
+      <li class="step">
+        <div class="step__media">{{ ui.img(step.image, '', '(min-width: 980px) 280px, 46vw') }}</div>
+        <div class="step__body"><h3>{{ step.title }}</h3><p>{{ step.text }}</p></div>
+      </li>
+      {%- endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section section--soft" id="faq">
+  <div class="container">
+    <header class="section-head section-head--center">
+      {{ ui.eyebrow('Questions', 'question') }}
+      <h2>Printing questions, answered</h2>
+    </header>
+    {{ ui.faqs(print.faqs, true) }}
+  </div>
+</section>
+
+{% set ctaTitle = 'Tell us what you want printed' %}
+{% set ctaText = 'Send the product, quantity and deadline — or just describe the idea — and we’ll reply with a quote.' %}
+{% set ctaService = 'Printing' %}
+{% set ctaLabel = 'Get a print quote' %}
+{% include "partials/cta.njk" %}
