@@ -2,7 +2,7 @@
 // every payment for a checkout is made against the same Helcim invoice, so "has this been
 // paid?" can always be answered by asking Helcim, with nothing extra to store here.
 //
-// Used by the browser and by the payment functions (payments/), so it must stay dependency-free.
+// Used by the browser and by the payment function (payments/), so it must stay dependency-free.
 
 export const INVOICE_PREFIX = 'ORD-'
 

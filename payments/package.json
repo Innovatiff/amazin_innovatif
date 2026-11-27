@@ -1,9 +1,13 @@
 {
   "name": "amazing-innovatif-payments",
   "private": true,
-  "type": "module",
-  "description": "The small payment service behind the checkouts: it talks to Helcim so the API token never reaches the browser. Deployed on Netlify (see netlify.toml and the README).",
+  "description": "The payment service behind the checkouts: one Firebase function that talks to Helcim, so the API token never reaches the browser. `npm run build:payments` (in the folder above) bundles it into dist/; see the README.",
+  "main": "dist/index.js",
+  "engines": {
+    "node": "22"
+  },
   "dependencies": {
-    "jose": "^6.2.18"
+    "firebase-admin": "^13.10.0",
+    "firebase-functions": "^7.4.0"
   }
 }

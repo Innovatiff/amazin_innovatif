@@ -6,6 +6,8 @@
 import { createServer } from 'node:http';
 
 export const FAKE_TOKEN = 'test-helcim-token';
+/** Where the browser test runs it; the payment function is told this address (see run-e2e.mjs). */
+export const FAKE_PORT = 8788;
 
 /** Helcim reports times in Mountain Time, as "YYYY-MM-DD HH:MM:SS". */
 function mountainTime(date = new Date()) {

@@ -4,9 +4,9 @@ The Amazing Innovatif site: printing, websites, the booking system, custom softw
 message form on every page, and a private **manager portal** where those
 messages arrive — and where you build **pricing pages and checkouts** to send
 to clients (the part that used to be the separate *Innovatif Designs* site).
-It runs on Firebase — Hosting for the site, Firestore for the data,
-Authentication for the portal login. Card payments on checkouts go through
-**Helcim**.
+It all runs on Firebase — Hosting for the site, Firestore for the data,
+Authentication for the portal login, and one small function for card payments,
+which go through **Helcim**.
 
 | Page | Address | What it is |
 | --- | --- | --- |
@@ -65,19 +65,21 @@ npx firebase login
 ```
 
 ```bash
-npm run deploy
+npm run deploy:site
 ```
 
 This builds the site, uploads it to Firebase Hosting and publishes the
-security rules in `firestore.rules`.
+security rules in `firestore.rules`. It works on Firebase's free plan.
+
+Once card payments are set up (step 5) use `npm run deploy` instead: it
+publishes the same two things **and** the payment function.
 
 > **Check before the first deploy:** publishing replaces the Firestore rules
 > currently on the project. The new rules cover `Contact`, `Bookings`,
 > `managers`, and the three collections Designs uses (`pages`, `checkouts`,
 > `images`), and close everything else. If this Firebase project stores other
-> data, add rules for it first — or publish only the site with
-> `npm run deploy:site`. (Designs needs the rules published at least once:
-> use `npm run deploy` the first time.)
+> data, add rules for it first. (Designs needs the rules published at least
+> once.)
 
 ### 4. Point the deposit link back to the new form
 
@@ -140,12 +142,22 @@ are not copied over automatically.
 A checkout's **Pay** button opens Helcim's own secure payment window on top of
 the page. Card details go straight to Helcim and never touch this site.
 
-The Helcim API token must stay secret, so it cannot live in the website. Three
-small functions in `payments/` keep it: they run on **Netlify** (free plan),
-exactly like the payment functions of the old Designs site did. The website
-itself stays on Firebase.
+The Helcim API token must stay secret, so it cannot live in the pages. One
+small Firebase function (`payments/`) keeps it and talks to Helcim; the pages
+reach it at `/api/…` on the site's own address. Nothing outside Firebase and
+Helcim is involved.
 
-### 1. Create the token in Helcim
+### 1. Put the Firebase project on the Blaze plan
+
+Firebase only runs functions on its pay-as-you-go plan. In the
+[Firebase console](https://console.firebase.google.com) → project
+**innovatif-f5cd1** → **Upgrade** → **Blaze**, and add a billing account.
+
+Everything the site already uses stays free, and a function this small sits
+inside the free monthly allowance, so expect a bill of zero or a few cents.
+The upgrade screen offers a budget alert — set one for peace of mind.
+
+### 2. Create the token in Helcim
 
 1. Sign in to Helcim → **All Tools → Integrations → API Access Configuration**
    → **New API Access**.
@@ -159,32 +171,30 @@ itself stays on Firebase.
 4. Create it and copy the **API token**. Treat it like a password: never put it
    in this repository, in `site.js`, or in a chat or email.
 
-### 2. Put the token on Netlify
+### 3. Give the token to Firebase
 
-If you still have the Netlify site that ran Innovatif Designs, reuse it: open
-its configuration in Netlify → **Build & deploy → Repository → Manage
-repository → Link to a different repository**, and pick this one. Otherwise
-**Add new project → Import an existing project** and pick this repository.
-Either way there is nothing to fill in — `netlify.toml` tells Netlify what to
-do. (After that, the Netlify address only runs the payment functions: the old
-Designs screens and any client links that pointed at them stop working. If
-clients still hold such links, leave the old project alone and create a new
-one.)
+```bash
+npx firebase functions:secrets:set HELCIM_API_TOKEN
+```
 
-Then, still in the configuration, **Environment variables → Add a variable**:
-`HELCIM_API_TOKEN` = the token from step 1. (Delete `STRIPE_SECRET_KEY` if it
-is still there.) Press **Deploys → Trigger deploy** so the functions pick it up.
+Paste the token when it asks for a value (nothing shows as you paste) and
+press Enter. It is kept in Google's Secret Manager — not in this repository
+and not on your computer. To replace the token later, run the same command
+again and publish again.
 
-### 3. Tell the website where the functions are
-
-In `src/_data/site.js` set `paymentsUrl` to your Netlify site's address, for
-example `'https://amazing-innovatif-pay.netlify.app'`, then
+### 4. Publish
 
 ```bash
 npm run deploy
 ```
 
-### 4. Try it once with a real card
+Use this command, not the `firebase deploy --only functions` that the previous
+step suggests: the site has to be published together with the function so that
+`/api` leads to it. The first time takes a few minutes while Firebase switches
+on the Google services it needs. If it asks how many days to keep old
+container images, press Enter to accept its suggestion.
+
+### 5. Try it once with a real card
 
 Make a checkout for a dollar, open its client link in a private window and pay
 it. It should say **Paid** on the page and in Designs, and appear in Helcim as
@@ -196,9 +206,11 @@ an invoice numbered `ORD-…`. Refund it in Helcim and the checkout goes back to
 > Helcim, not against a live Helcim account.
 
 If something is off, open the checkout while signed in as a manager — the label
-at the top says what: *Card payments not set up* (steps 2–3 are not done, or
-the site was not redeployed), *Helcim rejected the API token* (wrong or deleted
-token), or a line explaining what Helcim refused.
+at the top says what: *Card payments not set up* (the function has not been
+published — steps 1, 3 and 4), *Helcim rejected the API token* (wrong or
+deleted token — step 3), or a line explaining what Helcim refused. The
+function's own log is in the Firebase console under **Functions → payments →
+Logs**.
 
 Good to know:
 
@@ -235,7 +247,8 @@ and add the product to `src/_data/print.js` using the picture's file name as
 its `id`. (Use `software`, `web`, `booking` or `general` instead of `print` for
 other sections.)
 
-After any change, run `npm run deploy` again.
+After any change, run `npm run deploy` again (or `npm run deploy:site` if card
+payments are not set up).
 
 ## Working on it locally
 
@@ -254,16 +267,11 @@ Then open http://localhost:5000 (the emulator dashboard at
 http://localhost:4000 lets you create a test user and its `managers` entry).
 This needs Java installed. Designs works there too, on test data.
 
-To try the pay button locally as well, run the payment functions in a second
-terminal:
-
-```bash
-npm run payments
-```
-
-Without a token they answer "payments are not set up", which is what the page
-then shows. Helcim's window itself needs a live `https://` address that is on
-your token's list, so a real payment can only be tried on the published site.
+The payment function runs there too, behind `/api`, exactly as online. With no
+Helcim token on your computer it answers "payments are not set up", which is
+what the checkout then shows. Helcim's window itself needs a live `https://`
+address that is on your token's list, so a real payment can only be tried on
+the published site.
 
 ## Checks
 
@@ -273,8 +281,8 @@ npm test
 
 Runs 33 checks on the security rules (visitors can only send, strangers see
 nothing, managers can only change status and notes, a client can open their
-own page but never list pages or read a delivery address) and 22 checks on the
-payment functions, against a stand-in for Helcim: the amount charged, declined
+own page but never list pages or read a delivery address) and 25 checks on the
+payment function, against a stand-in for Helcim: the amount charged, declined
 cards, refunds, paying twice, a wrong token, who may see the list of payments.
 
 ```bash
@@ -297,13 +305,12 @@ src/            The site's source: pages (.njk), data, styles, scripts, images
   _data/        Prices, products and contact details
   assets/img/   The photos, already sized for the web
 designs/        Designs: the pricing-page and checkout screens (React), built into public/studio/
-payments/       The three payment functions that talk to Helcim (run on Netlify)
-netlify.toml    Tells Netlify to run only those functions
+payments/       The payment function that talks to Helcim (a Firebase function behind /api)
 public/         The built site (created by `npm run build`; not kept in git)
 firestore.rules Who can read and write what
-firebase.json   Hosting settings: clean addresses, old-page redirects, security headers
+firebase.json   Hosting settings (clean addresses, old-page redirects, security headers) and the function
 tests/          The checks described above
-scripts/        Helpers for adding photos and icons, and the local payment server
+scripts/        Helpers for adding photos and icons, and for bundling the payment function
 legacy/         The previous site, kept for reference — safe to delete
 ```
 

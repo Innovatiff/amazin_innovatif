@@ -3,6 +3,25 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
+  "functions": [
+    {
+      "source": "payments",
+      "codebase": "payments",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local",
+        "lib",
+        "index.ts"
+      ],
+      "predeploy": [
+        "npm run build:payments"
+      ]
+    }
+  ],
   "hosting": {
     "public": "public",
     "predeploy": [
@@ -166,7 +185,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com https://*.netlify.app http://127.0.0.1:8085 http://127.0.0.1:9099 http://127.0.0.1:8787; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com http://127.0.0.1:8085 http://127.0.0.1:9099; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
           },
           {
             "key": "Permissions-Policy",
@@ -187,7 +206,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com https://*.netlify.app http://127.0.0.1:8085 http://127.0.0.1:9099 http://127.0.0.1:8787; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com http://127.0.0.1:8085 http://127.0.0.1:9099; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
           },
           {
             "key": "Permissions-Policy",
@@ -208,7 +227,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com https://*.netlify.app http://127.0.0.1:8085 http://127.0.0.1:9099 http://127.0.0.1:8787; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com http://127.0.0.1:8085 http://127.0.0.1:9099; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
           },
           {
             "key": "Permissions-Policy",
@@ -229,7 +248,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com https://*.netlify.app http://127.0.0.1:8085 http://127.0.0.1:9099 http://127.0.0.1:8787; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+            "value": "default-src 'self'; script-src 'self' https://secure.helcim.app; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://*.googleapis.com http://127.0.0.1:8085 http://127.0.0.1:9099; frame-src https://secure.helcim.app https://*.helcim.app; form-action 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
           },
           {
             "key": "Permissions-Policy",
@@ -257,6 +276,13 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "function": {
+          "functionId": "payments",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/portal/designs",
         "destination": "/studio/index.html"
       },
@@ -280,6 +306,9 @@
     },
     "firestore": {
       "port": 8085
+    },
+    "functions": {
+      "port": 5001
     },
     "hosting": {
       "port": 5000

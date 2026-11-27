@@ -1,4 +1,4 @@
-// Checks the payment functions (payments/) against a stand-in for Helcim.
+// Checks the payment function (payments/) against a stand-in for Helcim.
 //
 //   npm run test:payments
 //
@@ -6,7 +6,7 @@
 // only ever counts for the checkout it was made for, and nobody pays twice.
 import assert from 'node:assert/strict';
 import { after, before, beforeEach, describe, test } from 'node:test';
-import { loadHandlers } from '../scripts/payments-dev.mjs';
+import { loadHandlers } from '../scripts/build-payments.mjs';
 import { FAKE_TOKEN, startFakeHelcim } from './fake-helcim.mjs';
 
 const ORDER_ID = 'Ab3dEfGh1jKlMn0pQr5t';
@@ -180,12 +180,70 @@ describe('opening a payment', () => {
     assert.match(body.error, /Service unavailable/);
   });
 
-  test('answers the browser’s permission check, so the site can call from another address', async () => {
-    const res = await lib.createCheckoutHandler(deps())(new Request('http://payments.test/checkout-create', { method: 'OPTIONS' }));
-    assert.equal(res.status, 204);
-    assert.equal(res.headers.get('access-control-allow-origin'), '*');
-    assert.match(res.headers.get('access-control-allow-headers'), /authorization/);
-    assert.equal((await create(ORDER_ID)).headers.get('access-control-allow-origin'), '*');
+});
+
+// Firebase calls the function with its own kind of request and response. This is the
+// translation in between, tried with the three addresses the pages really use.
+describe('as a Firebase function behind /api', () => {
+  const api = () => lib.createApi({
+    'checkout-create': lib.createCheckoutHandler(deps()),
+    'checkout-status': lib.createStatusHandler(deps()),
+    'checkout-payments': lib.createPaymentsHandler(deps()),
+  });
+  /** Calls the function the way Firebase does and collects what it answers. */
+  const call = async ({ method = 'GET', path, headers = {}, body }) => {
+    const answer = { status: 0, headers: {}, body: '' };
+    await api()(
+      { method, originalUrl: path, url: path, headers, rawBody: body === undefined ? undefined : Buffer.from(JSON.stringify(body)) },
+      { status: (code) => { answer.status = code; }, setHeader: (name, value) => { answer.headers[name.toLowerCase()] = value; }, send: (text) => { answer.body = text; } },
+    );
+    return { ...answer, json: answer.body ? JSON.parse(answer.body) : null };
+  };
+
+  test('each address reaches its own handler, with the body and the sign-in token intact', async () => {
+    const opened = await call({ method: 'POST', path: '/api/checkout-create', headers: { 'content-type': 'application/json' }, body: { id: ORDER_ID } });
+    assert.equal(opened.status, 200);
+    assert.equal(opened.json.invoiceNumber, lib.invoiceNumberFor(ORDER_ID));
+    assert.match(opened.headers['content-type'], /application\/json/);
+    assert.equal(opened.headers['cache-control'], 'no-store', 'payment answers must never be cached');
+    helcim.pay({ checkoutToken: opened.json.checkoutToken });
+
+    const state = await call({ path: `/api/checkout-status?id=${ORDER_ID}` });
+    assert.equal(state.status, 200);
+    assert.equal(state.json.state, 'paid');
+
+    assert.equal((await call({ path: '/api/checkout-payments' })).status, 401);
+    const list = await call({ path: '/api/checkout-payments', headers: { authorization: 'Bearer manager-token' } });
+    assert.equal(list.status, 200);
+    assert.deepEqual(Object.keys(list.json.payments), [lib.invoiceNumberFor(ORDER_ID)]);
+  });
+
+  test('works the same when the function is called at its own address, without /api', async () => {
+    const state = await call({ path: `/checkout-status?id=${ORDER_ID}` });
+    assert.deepEqual(state.json, { configured: true, state: 'unpaid' });
+  });
+
+  test('anything else gets a plain “nothing here”, never an error page', async () => {
+    for (const path of ['/api/', '/api/nothing', '/api/constructor', '/api/__proto__', '/']) {
+      const answer = await call({ path });
+      assert.equal(answer.status, 404, path);
+      assert.equal(answer.json.code, 'unknown_address', path);
+    }
+    assert.equal((await call({ method: 'GET', path: '/api/checkout-create' })).status, 405);
+  });
+
+  test('a handler that breaks answers with a tidy error instead of crashing the function', async () => {
+    const answer = { status: 0, body: '' };
+    const broken = lib.createApi({ boom: async () => { throw new Error('kaboom'); } });
+    const logged = console.error;
+    console.error = () => {};
+    try {
+      await broken({ method: 'GET', url: '/api/boom', headers: {} }, { status: (code) => { answer.status = code; }, setHeader: () => {}, send: (text) => { answer.body = text; } });
+    } finally {
+      console.error = logged;
+    }
+    assert.equal(answer.status, 500);
+    assert.ok(!answer.body.includes('kaboom'), 'internal details must not leak to the browser');
   });
 });
 

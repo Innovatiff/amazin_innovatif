@@ -33,13 +33,6 @@ export default {
   depositLink: 'https://buy.stripe.com/aFa9AVdvEeWifgigOZasg0i',
   depositAmount: '$97',
 
-  // ── Card payments for checkouts (Helcim) ───────────────────────────────
-  // The address of your payment service on Netlify, without a slash at the
-  // end, e.g. 'https://amazing-innovatif-pay.netlify.app'. Leave it empty until
-  // you have set it up (see "Card payments" in the README): checkouts then
-  // tell clients that online payment isn't switched on yet.
-  paymentsUrl: '',
-
   // Firebase web configuration (safe to publish — access is controlled by
   // firestore.rules, not by keeping these values secret).
   firebase: {

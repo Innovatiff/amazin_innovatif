@@ -306,7 +306,7 @@ export function describeHelcimError(error: unknown): Failure {
       return {
         status: 503,
         code: 'helcim_auth',
-        error: 'Helcim rejected the API token. Check HELCIM_API_TOKEN in your Netlify environment variables.',
+        error: 'Helcim rejected the API token. Set it again with “npx firebase functions:secrets:set HELCIM_API_TOKEN”, then run “npm run deploy”.',
       }
     }
     if (error.status === 403) {

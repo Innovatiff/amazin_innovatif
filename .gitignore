@@ -9,6 +9,9 @@ public/
 *-debug.log
 firebase-export-*/
 
+# The payment function's bundle (created by `npm run build`)
+payments/dist/
+
 # Local files
 .DS_Store
 .env
