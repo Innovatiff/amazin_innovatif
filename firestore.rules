@@ -8,6 +8,8 @@ rules_version = '2';
 //   • A manager is an account whose user ID has a document in "managers".
 //     Those documents can only be created by the project owner in the
 //     Firebase console; nothing on the website can add one.
+//   • Pricing pages and checkouts ("Designs" in the portal) can be opened by
+//     anyone who has the link, and changed only by managers.
 //
 // After changing this file run `npm test`, then `npm run deploy`.
 
@@ -119,6 +121,62 @@ service cloud.firestore {
       allow create: if validLead();
       allow read, delete: if isManager();
       allow update: if isManager() && managerEdit();
+    }
+
+    // ── Designs: pricing pages and checkouts sent to clients ─────────────
+    // A client opens their page with a link, so anyone may read ONE page or
+    // checkout when they know its address (the ids cannot be guessed), but only
+    // managers can see the list, create, change or delete them.
+    match /pages/{pageId} {
+      allow get: if true;
+      allow list, delete: if isManager();
+      allow create, update: if isManager()
+        && request.resource.data.title is string
+        && request.resource.data.services is list;
+    }
+
+    match /checkouts/{checkoutId} {
+      allow get: if true;
+      allow list, delete: if isManager();
+      allow create, update: if isManager()
+        && request.resource.data.title is string
+        && request.resource.data.items is list;
+
+      // Where to send a physical order. The client fills this in on the
+      // checkout page before paying, so anyone may ADD an address to a checkout
+      // that asks for one, but only managers can read or remove them.
+      match /deliveries/{deliveryId} {
+        function validDelivery() {
+          let data = request.resource.data;
+          return data.keys().hasOnly(['name', 'phone', 'line1', 'line2', 'city', 'region', 'postalCode', 'country', 'createdAt'])
+            && data.keys().hasAll(['name', 'line1', 'city', 'postalCode', 'country', 'createdAt'])
+            && isText(data.name, 1, 120)
+            && isText(data.line1, 1, 200)
+            && isText(data.city, 1, 100)
+            && isText(data.postalCode, 1, 20)
+            && isText(data.country, 2, 2)
+            && optionalText(data, 'phone', 40)
+            && optionalText(data, 'line2', 200)
+            && optionalText(data, 'region', 100)
+            && data.createdAt == request.time
+            && get(/databases/$(database)/documents/checkouts/$(checkoutId)).data.collectShipping == true;
+        }
+
+        allow create: if validDelivery();
+        allow read, delete: if isManager();
+        allow update: if false;
+      }
+    }
+
+    // Pictures uploaded for those pages, stored as text (so no paid storage
+    // plan is needed). Shown to clients, so readable one at a time.
+    match /images/{imageId} {
+      allow get: if true;
+      allow list, delete: if isManager();
+      allow create: if isManager()
+        && request.resource.data.dataUrl is string
+        && request.resource.data.dataUrl.size() <= 950000;
+      allow update: if false;
     }
 
     // Everything else is closed.

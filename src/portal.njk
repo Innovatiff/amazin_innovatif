@@ -81,18 +81,21 @@ eleventyExcludeFromCollections: true
           <span class="brand__mark" aria-hidden="true"></span>
           <span class="brand__name">{{ site.name }}</span>
         </a>
-        <div class="tabs" role="tablist" aria-label="Inbox">
-          <button class="tab" type="button" role="tab" aria-selected="true" data-tab="Contact">{{ ui.icon('tray') }}<span>Messages</span><b data-count="Contact" hidden></b></button>
-          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="Bookings">{{ ui.icon('calendar-check') }}<span>Booking leads</span><b data-count="Bookings" hidden></b></button>
+        <div class="tabs" aria-label="Portal sections">
+          <button class="tab" type="button" aria-pressed="true" data-tab="Contact">{{ ui.icon('tray') }}<span>Messages</span><b data-count="Contact" hidden></b></button>
+          <button class="tab" type="button" aria-pressed="false" data-tab="Bookings">{{ ui.icon('calendar-check') }}<span class="tab__full">Booking leads</span><span class="tab__short">Bookings</span><b data-count="Bookings" hidden></b></button>
+          {#- Pricing pages and checkouts for clients: its own screens, same sign-in. -#}
+          <a class="tab" href="/portal/designs">{{ ui.icon('palette') }}<span>Designs</span></a>
         </div>
         <div class="app__user">
           <button class="icon-button" type="button" data-alerts aria-pressed="false" title="Sound and desktop alerts for new messages">{{ ui.icon('bell') }}<span class="sr-only">Alerts for new messages</span></button>
           <span class="app__email" data-user-email></span>
-          <button class="btn btn--outline btn--sm" type="button" data-signout>{{ ui.icon('sign-out') }}<span>Sign out</span></button>
+          <button class="btn btn--outline btn--sm" type="button" data-signout aria-label="Sign out">{{ ui.icon('sign-out') }}<span>Sign out</span></button>
         </div>
       </header>
 
-      <div class="app__body">
+      <main class="app__body">
+        <h1 class="sr-only">Manager portal</h1>
         <section class="pane pane--list" aria-label="Items">
           <div class="toolbar">
             <label class="search">
@@ -123,7 +126,7 @@ eleventyExcludeFromCollections: true
             <p>Select a message to read it.</p>
           </div>
         </section>
-      </div>
+      </main>
 
       <div class="toast" role="status" data-toast hidden></div>
     </div>

@@ -46,6 +46,44 @@ const lead = (extra = {}) => ({
   ...extra,
 });
 
+const quote = (extra = {}) => ({
+  title: 'Website and print package',
+  client: 'North Build',
+  currency: 'CAD',
+  services: [{ id: 's1', name: 'Five-page website', price: 1200, marketPrice: 2500 }],
+  createdAt: '2026-11-26T12:00:00.000Z',
+  updatedAt: '2026-11-26T12:00:00.000Z',
+  ...extra,
+});
+
+const order = (extra = {}) => ({
+  title: 'Brand launch kit',
+  client: 'Aurora Coffee Co.',
+  currency: 'CAD',
+  items: [{ id: 'a', name: 'Logo design package', quantity: 1, price: 650, listPrice: 900 }],
+  shipping: 15,
+  taxRate: 13,
+  collectShipping: true,
+  shipCountries: ['CA', 'US'],
+  markedPaidAt: '',
+  createdAt: '2026-11-26T12:00:00.000Z',
+  updatedAt: '2026-11-26T12:00:00.000Z',
+  ...extra,
+});
+
+const address = (extra = {}) => ({
+  name: 'Maria Lopez',
+  phone: '',
+  line1: '12 King Street West',
+  line2: '',
+  city: 'Toronto',
+  region: 'ON',
+  postalCode: 'M5H 1A1',
+  country: 'CA',
+  createdAt: serverTimestamp(),
+  ...extra,
+});
+
 before(async () => {
   env = await initializeTestEnvironment({
     projectId: 'demo-innovatif',
@@ -64,6 +102,12 @@ beforeEach(async () => {
     await setDoc(doc(db, 'managers/boss'), { email: 'owner@example.com' });
     await setDoc(doc(db, 'Contact/m1'), { ...message(), createdAt: Timestamp.now() });
     await setDoc(doc(db, 'Bookings/b1'), { ...lead(), createdAt: Timestamp.now() });
+    // Designs: a pricing page, a checkout that ships, one that does not, and a picture.
+    await setDoc(doc(db, 'pages/p1'), quote());
+    await setDoc(doc(db, 'checkouts/c1'), order({ collectShipping: true }));
+    await setDoc(doc(db, 'checkouts/c2'), order({ collectShipping: false }));
+    await setDoc(doc(db, 'checkouts/c1/deliveries/d1'), { ...address(), createdAt: Timestamp.now() });
+    await setDoc(doc(db, 'images/i1'), { dataUrl: 'data:image/png;base64,AAAA', createdAt: '2026-11-26T12:00:00.000Z' });
   });
 });
 
@@ -224,5 +268,94 @@ describe('managers', () => {
   test('cannot add or remove managers from the website', async () => {
     await assertFails(setDoc(doc(manager, 'managers/friend'), { email: 'friend@example.com' }));
     await assertFails(deleteDoc(doc(manager, 'managers/boss')));
+  });
+});
+
+describe('designs: pricing pages and checkouts', () => {
+  test('anyone with the link can open one page or checkout, and its pictures', async () => {
+    await assertSucceeds(getDoc(doc(visitor, 'pages/p1')));
+    await assertSucceeds(getDoc(doc(visitor, 'checkouts/c1')));
+    await assertSucceeds(getDoc(doc(visitor, 'images/i1')));
+  });
+
+  test('nobody but a manager can see the lists', async () => {
+    for (const who of [visitor, stranger]) {
+      for (const name of ['pages', 'checkouts', 'images']) await assertFails(getDocs(collection(who, name)));
+    }
+    for (const name of ['pages', 'checkouts', 'images']) await assertSucceeds(getDocs(collection(manager, name)));
+  });
+
+  test('visitors and other accounts cannot create, change or delete anything', async () => {
+    for (const who of [visitor, stranger]) {
+      await assertFails(addDoc(collection(who, 'pages'), quote()));
+      await assertFails(addDoc(collection(who, 'checkouts'), order()));
+      await assertFails(addDoc(collection(who, 'images'), { dataUrl: 'data:image/png;base64,AAAA' }));
+      // The one that matters most: a buyer lowering their own price, or marking it paid.
+      await assertFails(updateDoc(doc(who, 'checkouts/c1'), { items: [{ id: 'a', name: 'Logo design package', quantity: 1, price: 1, listPrice: 0 }] }));
+      await assertFails(updateDoc(doc(who, 'checkouts/c1'), { markedPaidAt: '2026-11-26T18:30:00.000Z' }));
+      await assertFails(updateDoc(doc(who, 'pages/p1'), { title: 'Changed' }));
+      await assertFails(deleteDoc(doc(who, 'checkouts/c1')));
+      await assertFails(deleteDoc(doc(who, 'pages/p1')));
+      await assertFails(deleteDoc(doc(who, 'images/i1')));
+    }
+  });
+
+  test('managers can create, edit, mark as paid and delete', async () => {
+    await assertSucceeds(addDoc(collection(manager, 'pages'), quote()));
+    await assertSucceeds(addDoc(collection(manager, 'checkouts'), order()));
+    await assertSucceeds(setDoc(doc(manager, 'checkouts/c1'), order({ title: 'Edited' })));
+    await assertSucceeds(updateDoc(doc(manager, 'checkouts/c1'), { markedPaidAt: '2026-11-26T18:30:00.000Z' }));
+    await assertSucceeds(deleteDoc(doc(manager, 'pages/p1')));
+    await assertSucceeds(deleteDoc(doc(manager, 'checkouts/c2')));
+  });
+
+  test('managers cannot save something that is not a page or a checkout', async () => {
+    await assertFails(addDoc(collection(manager, 'pages'), { title: 'No services' }));
+    await assertFails(addDoc(collection(manager, 'checkouts'), { title: 42, items: [] }));
+    await assertFails(setDoc(doc(manager, 'checkouts/c1'), { title: 'Items is not a list', items: 'nope' }));
+  });
+
+  test('pictures have a size limit and cannot be swapped afterwards', async () => {
+    await assertSucceeds(addDoc(collection(manager, 'images'), { dataUrl: 'data:image/png;base64,' + 'A'.repeat(1000) }));
+    await assertFails(addDoc(collection(manager, 'images'), { dataUrl: 'A'.repeat(950001) }));
+    await assertFails(updateDoc(doc(manager, 'images/i1'), { dataUrl: 'data:image/png;base64,BBBB' }));
+    await assertSucceeds(deleteDoc(doc(manager, 'images/i1')));
+  });
+});
+
+describe('designs: delivery addresses', () => {
+  test('a client can add their address to a checkout that asks for one', async () => {
+    await assertSucceeds(addDoc(collection(visitor, 'checkouts/c1/deliveries'), address()));
+    await assertSucceeds(addDoc(collection(visitor, 'checkouts/c1/deliveries'), address({ phone: '416 555 0100', line2: 'Suite 4' })));
+  });
+
+  test('but not to a checkout that does not ask for one, or does not exist', async () => {
+    await assertFails(addDoc(collection(visitor, 'checkouts/c2/deliveries'), address()));
+    await assertFails(addDoc(collection(visitor, 'checkouts/nothing-here/deliveries'), address()));
+  });
+
+  test('an address must be complete, plain text and the right size', async () => {
+    const add = (extra) => addDoc(collection(visitor, 'checkouts/c1/deliveries'), address(extra));
+    await assertFails(add({ name: '' }));
+    await assertFails(add({ line1: '' }));
+    await assertFails(add({ city: '' }));
+    await assertFails(add({ postalCode: '' }));
+    await assertFails(add({ country: 'Canada' }));
+    await assertFails(add({ name: 'x'.repeat(121) }));
+    await assertFails(add({ line1: ['12 King Street'] }));
+    await assertFails(add({ note: 'an extra field' }));
+    await assertFails(add({ createdAt: Timestamp.fromDate(new Date('2020-01-01')) }));
+  });
+
+  test('only managers can read addresses; nobody can change one', async () => {
+    for (const who of [visitor, stranger]) {
+      await assertFails(getDoc(doc(who, 'checkouts/c1/deliveries/d1')));
+      await assertFails(getDocs(collection(who, 'checkouts/c1/deliveries')));
+      await assertFails(deleteDoc(doc(who, 'checkouts/c1/deliveries/d1')));
+    }
+    await assertSucceeds(getDocs(collection(manager, 'checkouts/c1/deliveries')));
+    await assertFails(updateDoc(doc(manager, 'checkouts/c1/deliveries/d1'), { city: 'Ottawa' }));
+    await assertFails(updateDoc(doc(visitor, 'checkouts/c1/deliveries/d1'), { city: 'Ottawa' }));
+    await assertSucceeds(deleteDoc(doc(manager, 'checkouts/c1/deliveries/d1')));
   });
 });

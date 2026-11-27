@@ -2,8 +2,11 @@
 
 The Amazing Innovatif site: printing, websites, the booking system, custom software, a
 message form on every page, and a private **manager portal** where those
-messages arrive. It runs on Firebase — Hosting for the site, Firestore for the
-messages, Authentication for the portal login.
+messages arrive — and where you build **pricing pages and checkouts** to send
+to clients (the part that used to be the separate *Innovatif Designs* site).
+It runs on Firebase — Hosting for the site, Firestore for the data,
+Authentication for the portal login. Card payments on checkouts go through
+**Helcim**.
 
 | Page | Address | What it is |
 | --- | --- | --- |
@@ -15,6 +18,9 @@ messages, Authentication for the portal login.
 | Contact | `/contact` | Call, WhatsApp, or the message form |
 | Get started | `/get-started` | The five-step booking-system form, with the deposit link |
 | Manager portal | `/portal` | Sign in to read and manage messages and booking leads |
+| Designs | `/portal/designs` | The portal's third tab: build pricing pages and checkouts for clients |
+| A client's pricing page | `/quote/…` | What a client sees when they open a pricing-page link |
+| A client's checkout | `/checkout/…` | The order, the delivery address and the card payment |
 
 ## First-time setup
 
@@ -49,7 +55,8 @@ Open the [Firebase console](https://console.firebase.google.com) → project
 
 Only accounts listed in `managers` can read anything. To add another manager,
 repeat steps 2 and 3. (If someone signs in without being on the list, the
-portal shows them their ID so you can add it.)
+portal shows them their ID so you can add it.) The same sign-in opens
+**Designs** — there is no second account to create.
 
 ### 3. Publish
 
@@ -65,16 +72,25 @@ This builds the site, uploads it to Firebase Hosting and publishes the
 security rules in `firestore.rules`.
 
 > **Check before the first deploy:** publishing replaces the Firestore rules
-> currently on the project. The new rules cover the `Contact`, `Bookings` and
-> `managers` collections and close everything else. If this Firebase project
-> stores other data, add rules for it first — or publish only the site with
-> `npm run deploy:site`.
+> currently on the project. The new rules cover `Contact`, `Bookings`,
+> `managers`, and the three collections Designs uses (`pages`, `checkouts`,
+> `images`), and close everything else. If this Firebase project stores other
+> data, add rules for it first — or publish only the site with
+> `npm run deploy:site`. (Designs needs the rules published at least once:
+> use `npm run deploy` the first time.)
 
 ### 4. Point the deposit link back to the new form
 
 In Stripe, set the deposit payment link's "after payment" address to
 `https://YOUR-DOMAIN/get-started?payment=success`. (The old `/form.html`
 address still forwards there.)
+
+### 5. Card payments on checkouts (Helcim)
+
+Optional until you want clients to pay online — see
+[Card payments (Helcim)](#card-payments-helcim) below. Until it is done,
+checkouts still work as an order summary: the pay button tells the client that
+online payment isn't switched on yet, and you can mark an order as paid by hand.
 
 ## How a message travels
 
@@ -89,6 +105,111 @@ address still forwards there.)
 Booking-system requests from `/get-started` work the same way and appear under
 **Booking leads**.
 
+## Designs: pricing pages and checkouts
+
+Sign in at `/portal` and open the **Designs** tab (or go straight to
+`/portal/designs`). **New page** offers two kinds:
+
+- **Pricing page** — your price next to what the market charges, service by
+  service, with the saving worked out. Good for proposals. *Present* shows it
+  full screen; *Print / PDF* gives a paper version.
+- **Checkout** — products with quantities, a shipping fee, tax, and an optional
+  delivery address. The client pays by card on the page.
+
+Both editors show a live preview as you type. When you save, press **Copy
+client link** and send that link to your client — it is the only thing they
+need. Clients never sign in, and a link only opens its own page: nobody can
+list your other pages.
+
+What you see for a checkout:
+
+- **Awaiting payment / Paid** on the checkout and on its card in the list. The
+  paid state comes from Helcim itself, not from the client's browser.
+- **Deliver to:** the address the client typed in, when you asked for one.
+  Only managers can read it.
+- **⋯ → Mark as paid** for cash, e-transfer or anything paid outside the page
+  (and *Remove the paid mark* to undo it).
+
+Everything is stored in the same Firebase project as the messages: `pages`,
+`checkouts` (with each order's `deliveries`) and `images` (pictures you upload
+are shrunk in the browser first). Pages made on the old Innovatif Designs site
+are not copied over automatically.
+
+## Card payments (Helcim)
+
+A checkout's **Pay** button opens Helcim's own secure payment window on top of
+the page. Card details go straight to Helcim and never touch this site.
+
+The Helcim API token must stay secret, so it cannot live in the website. Three
+small functions in `payments/` keep it: they run on **Netlify** (free plan),
+exactly like the payment functions of the old Designs site did. The website
+itself stays on Firebase.
+
+### 1. Create the token in Helcim
+
+1. Sign in to Helcim → **All Tools → Integrations → API Access Configuration**
+   → **New API Access**.
+2. Name it (for example "Website checkouts") and set the access restrictions:
+   **General: Read & Write**, **Transaction Processing: Positive Transaction**.
+   Settings can stay at *No Access*.
+3. Tick the box saying the token is used for a **HelcimPay.js** checkout and
+   list every address your checkouts open on, for example `https://innovatif.ca`,
+   `https://www.innovatif.ca` and `https://innovatif-f5cd1.web.app`. Helcim's
+   window does not open on an address that is not on this list.
+4. Create it and copy the **API token**. Treat it like a password: never put it
+   in this repository, in `site.js`, or in a chat or email.
+
+### 2. Put the token on Netlify
+
+If you still have the Netlify site that ran Innovatif Designs, reuse it: open
+its configuration in Netlify → **Build & deploy → Repository → Manage
+repository → Link to a different repository**, and pick this one. Otherwise
+**Add new project → Import an existing project** and pick this repository.
+Either way there is nothing to fill in — `netlify.toml` tells Netlify what to
+do. (After that, the Netlify address only runs the payment functions: the old
+Designs screens and any client links that pointed at them stop working. If
+clients still hold such links, leave the old project alone and create a new
+one.)
+
+Then, still in the configuration, **Environment variables → Add a variable**:
+`HELCIM_API_TOKEN` = the token from step 1. (Delete `STRIPE_SECRET_KEY` if it
+is still there.) Press **Deploys → Trigger deploy** so the functions pick it up.
+
+### 3. Tell the website where the functions are
+
+In `src/_data/site.js` set `paymentsUrl` to your Netlify site's address, for
+example `'https://amazing-innovatif-pay.netlify.app'`, then
+
+```bash
+npm run deploy
+```
+
+### 4. Try it once with a real card
+
+Make a checkout for a dollar, open its client link in a private window and pay
+it. It should say **Paid** on the page and in Designs, and appear in Helcim as
+an invoice numbered `ORD-…`. Refund it in Helcim and the checkout goes back to
+*Awaiting payment*.
+
+> **Do this test before sending a checkout to a client.** The connection was
+> built from Helcim's documentation and is tested here against a stand-in for
+> Helcim, not against a live Helcim account.
+
+If something is off, open the checkout while signed in as a manager — the label
+at the top says what: *Card payments not set up* (steps 2–3 are not done, or
+the site was not redeployed), *Helcim rejected the API token* (wrong or deleted
+token), or a line explaining what Helcim refused.
+
+Good to know:
+
+- **Prices cannot be tampered with.** The amount is worked out by the function
+  from the saved checkout, never taken from the browser.
+- **One checkout, one payment.** Each checkout is one Helcim invoice. Once it
+  is paid, the pay button is gone and a second payment is refused.
+- **Currencies:** checkouts can be in CAD or USD — whichever your Helcim
+  account accepts.
+- **Refunds, receipts and payouts** are handled in your Helcim account.
+
 ## Changing things
 
 | To change… | Edit |
@@ -101,6 +222,8 @@ Booking-system requests from `/get-started` work the same way and appear under
 | Home page sections | `src/_data/home.js` and `src/index.njk` |
 | Headlines and wording on a page | that page's file in `src/` (e.g. `src/printing.njk`) |
 | Colors, type sizes, spacing, backgrounds | the list of settings at the top of `src/assets/css/site.css` |
+| The look of pricing pages and checkouts | `designs/src/styles.css` (its colors mirror `site.css`) |
+| The seller name pre-filled on new pages and checkouts | `name` in `src/_data/site.js` |
 
 **Add a product photo:** put the full-size pictures in a folder, then
 
@@ -129,7 +252,18 @@ npm run emulators
 
 Then open http://localhost:5000 (the emulator dashboard at
 http://localhost:4000 lets you create a test user and its `managers` entry).
-This needs Java installed.
+This needs Java installed. Designs works there too, on test data.
+
+To try the pay button locally as well, run the payment functions in a second
+terminal:
+
+```bash
+npm run payments
+```
+
+Without a token they answer "payments are not set up", which is what the page
+then shows. Helcim's window itself needs a live `https://` address that is on
+your token's list, so a real payment can only be tried on the published site.
 
 ## Checks
 
@@ -137,19 +271,24 @@ This needs Java installed.
 npm test
 ```
 
-Runs 23 checks on the security rules (visitors can only send, strangers see
-nothing, managers can only change status and notes).
+Runs 33 checks on the security rules (visitors can only send, strangers see
+nothing, managers can only change status and notes, a client can open their
+own page but never list pages or read a delivery address) and 22 checks on the
+payment functions, against a stand-in for Helcim: the amount charged, declined
+cards, refunds, paying twice, a wrong token, who may see the list of payments.
 
 ```bash
 npm run test:e2e
 ```
 
 Drives a real browser through the whole flow — sending messages, the booking
-form, signing in to the portal, reading, updating and deleting. It also scrolls
-the printing page with a real mouse wheel and finger drags, uses the category
-chips, opens the phone menu halfway down a page, and checks that nothing is
-wider than a small phone's screen. The first time, run
-`npx playwright install chromium`.
+form, signing in to the portal, reading, updating and deleting. In Designs it
+builds a checkout and a pricing page, opens them as a client, is refused
+without a delivery address, has a card declined, pays, and checks the manager
+sees it paid with the address. It also scrolls the printing page with a real
+mouse wheel and finger drags, uses the category chips, opens the phone menu
+halfway down a page, and checks that nothing is wider than a small phone's
+screen. The first time, run `npx playwright install chromium`.
 
 ## What's in the folders
 
@@ -157,11 +296,14 @@ wider than a small phone's screen. The first time, run
 src/            The site's source: pages (.njk), data, styles, scripts, images
   _data/        Prices, products and contact details
   assets/img/   The photos, already sized for the web
+designs/        Designs: the pricing-page and checkout screens (React), built into public/studio/
+payments/       The three payment functions that talk to Helcim (run on Netlify)
+netlify.toml    Tells Netlify to run only those functions
 public/         The built site (created by `npm run build`; not kept in git)
 firestore.rules Who can read and write what
 firebase.json   Hosting settings: clean addresses, old-page redirects, security headers
 tests/          The checks described above
-scripts/        Helpers for adding photos and icons
+scripts/        Helpers for adding photos and icons, and the local payment server
 legacy/         The previous site, kept for reference — safe to delete
 ```
 

@@ -90,7 +90,9 @@ body.portal {
   white-space: nowrap;
 }
 .tab:hover { color: #fff; }
-.tab[aria-selected='true'] { background: var(--surface-3); color: #fafafa; }
+a.tab { text-decoration: none; }
+.tab__short { display: none; }
+.tab[aria-pressed='true'] { background: var(--surface-3); color: #fafafa; }
 .tab b, .filter b {
   min-width: 1.35rem;
   padding: 0 0.35rem;
@@ -302,4 +304,17 @@ body.portal {
   body.is-reading .pane--detail { display: grid; }
   .detail__back { display: inline-grid; }
   .app__user .btn span { display: none; }
+}
+
+/* Three tabs side by side on a phone: no icons, and a shorter word on the narrowest. */
+@media (max-width: 560px) {
+  .tabs { overflow-x: auto; scrollbar-width: none; }
+  .tab { flex: 1 0 auto; gap: 0.35rem; padding: 0.5rem 0.4rem; font-size: 0.85rem; }
+  .tab .icon { display: none; }
+}
+@media (max-width: 400px) {
+  .tab__full { display: none; }
+  .tab__short { display: inline; }
+  .app__bar { column-gap: 0.5rem; }
+  .app__bar .brand { font-size: 0.98rem; }
 }
