@@ -25,9 +25,10 @@ export default {
   // (it only appears once `whatsapp` above is filled in). Set to false to hide it.
   whatsappBubble: true,
 
-  // Public web address, without a trailing slash, e.g. 'https://www.example.com'.
-  // Used for share previews and the sitemap. Optional until the domain is live.
-  url: '',
+  // Public web address, without a trailing slash. Used for share previews, the
+  // sitemap and the "canonical" address search engines are told about.
+  // (www.innovatif.ca only forwards here, so this is the one to use.)
+  url: 'https://innovatif.ca',
 
   // Stripe link for the $97 deposit that reserves a booking-system spot.
   depositLink: 'https://buy.stripe.com/aFa9AVdvEeWifgigOZasg0i',
