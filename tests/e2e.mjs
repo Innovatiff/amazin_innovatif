@@ -5,14 +5,14 @@
 //   →  a manager signs in to the portal  →  reads it, updates it, deletes it.
 //
 // Run with `npm run test:e2e` (needs Java for the emulators and a Playwright
-// browser: `npx playwright install chromium`). Nothing here touches the live
-// project — everything runs under the offline "demo-innovatif" project.
+// browser: `npx playwright install chromium`). It is started by run-e2e.mjs,
+// inside the emulators. Nothing here touches the live project — everything
+// runs under the offline "demo-innovatif" project.
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 import site from '../src/_data/site.js';
-import { startPayments } from '../scripts/payments-dev.mjs';
-import { FAKE_TOKEN, startFakeHelcim } from './fake-helcim.mjs';
+import { FAKE_PORT, startFakeHelcim } from './fake-helcim.mjs';
 
 const SITE = 'http://127.0.0.1:5000';
 const FIRESTORE = 'http://127.0.0.1:8085';
@@ -128,14 +128,11 @@ async function shot(page, name) {
 
 await reset();
 
-// Card payments: the real payment functions (payments/), run on this computer and
-// pointed at a stand-in for Helcim, so the whole pay flow is exercised with no real
-// account and no real money. They read orders from the Firestore emulator, as the
-// site does here. (FIRESTORE_EMULATOR_HOST etc. are set by `firebase emulators:exec`.)
-const helcim = await startFakeHelcim({ port: 8788 });
-process.env.HELCIM_API_TOKEN = FAKE_TOKEN;
-process.env.HELCIM_API_URL = helcim.url;
-const payments = await startPayments({ port: 8787, quiet: true });
+// Card payments: the real payment function (payments/) runs in the Functions emulator,
+// behind /api on the site exactly as it is online. run-e2e.mjs has pointed it at this
+// stand-in for Helcim, so the whole pay flow is exercised with no real account and no
+// real money.
+const helcim = await startFakeHelcim({ port: FAKE_PORT });
 
 // What Helcim's payment window does, without the window: it is told a token, the
 // buyer pays (or is declined, or closes it), and it reports back with a message.
@@ -162,7 +159,7 @@ async function withHelcimWindow(target) {
     route.fulfill({ status: 200, contentType: 'text/javascript', body: HELCIM_WINDOW }));
 }
 
-const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+const proxy = process.env.E2E_BROWSER_PROXY || process.env.HTTPS_PROXY || process.env.https_proxy;
 const browser = await chromium.launch(proxy ? { proxy: { server: proxy, bypass: '127.0.0.1,localhost' } } : {});
 const scale = Number(process.env.SCALE || 1); // SCALE=2 for sharper screenshots
 const context = await browser.newContext({ viewport: { width: 1280, height: 860 }, deviceScaleFactor: scale });
@@ -606,7 +603,7 @@ await step('after a refresh the order is still paid, and cannot be paid twice', 
   await buyer.reload({ waitUntil: 'networkidle' });
   await buyer.locator('.co-paid', { hasText: 'Paid' }).waitFor();
   assert.equal(await buyer.locator('.co-pay-btn').count(), 0);
-  const again = await fetch('http://127.0.0.1:8787/.netlify/functions/checkout-create', {
+  const again = await fetch(`${SITE}/api/checkout-create`, {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: checkoutId }),
   });
   assert.equal(again.status, 409);
@@ -650,11 +647,11 @@ await step('a manager can mark a checkout as paid by hand (cash or e-transfer)',
   await portal.getByRole('button', { name: 'More actions' }).click();
   await portal.getByRole('menuitem', { name: 'Mark as paid' }).click();
   await portal.locator('.toolbar .pill', { hasText: 'marked by hand' }).waitFor();
-  // The client sees it paid and is not offered the pay button; the payment functions agree.
+  // The client sees it paid and is not offered the pay button; the payment function agrees.
   await buyer.goto(cashUrl, { waitUntil: 'networkidle' });
   await buyer.locator('.co-paid', { hasText: 'Paid' }).waitFor();
   assert.equal(await buyer.locator('.co-pay-btn').count(), 0);
-  const refused = await fetch('http://127.0.0.1:8787/.netlify/functions/checkout-create', {
+  const refused = await fetch(`${SITE}/api/checkout-create`, {
     method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: cashUrl.split('/').pop() }),
   });
   assert.equal(refused.status, 409);
@@ -847,7 +844,6 @@ await step('the menu and message form work at phone size', async () => {
 });
 
 await browser.close();
-await payments.close();
 await helcim.close();
 
 const failed = results.filter(([ok]) => !ok);

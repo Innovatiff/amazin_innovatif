@@ -16,7 +16,7 @@ import {
   type HelcimTransaction,
   type PaymentRecord,
 } from './helcim'
-import { DOC_ID, TRANSACTION_ID, fail, json, withCors, type Handler } from './http'
+import { DOC_ID, TRANSACTION_ID, fail, json, type Handler } from './http'
 
 /** Everything a handler touches outside its own logic, so the tests can swap it out. */
 export interface Deps {
@@ -31,7 +31,7 @@ const message = (error: unknown) => (error instanceof Error ? error.message : St
 
 /** POST { id } → { checkoutToken } that opens Helcim's payment window for that order. */
 export function createCheckoutHandler(deps: Deps = defaultDeps): Handler {
-  return withCors(async (req) => {
+  return async (req) => {
     if (req.method !== 'POST') return fail(405, 'Use POST.')
     const body = (await req.json().catch(() => null)) as { id?: unknown } | null
     const id = typeof body?.id === 'string' ? body.id : ''
@@ -87,7 +87,7 @@ export function createCheckoutHandler(deps: Deps = defaultDeps): Handler {
       const failure = describeHelcimError(error)
       return fail(failure.status, failure.error, failure.code)
     }
-  })
+  }
 }
 
 /**
@@ -95,7 +95,7 @@ export function createCheckoutHandler(deps: Deps = defaultDeps): Handler {
  * Public, and it never returns personal data: only paid or not, the amount and the date.
  */
 export function createStatusHandler(deps: Deps = defaultDeps): Handler {
-  return withCors(async (req) => {
+  return async (req) => {
     if (req.method !== 'GET') return fail(405, 'Use GET.')
     const params = new URL(req.url).searchParams
     const id = params.get('id') ?? ''
@@ -123,7 +123,7 @@ export function createStatusHandler(deps: Deps = defaultDeps): Handler {
       const failure = describeHelcimError(error)
       return json({ configured: true, state: 'unknown', error: failure.error, code: failure.code })
     }
-  })
+  }
 }
 
 const DAY = 24 * 60 * 60 * 1000
@@ -131,7 +131,7 @@ const PAGE = 1000
 
 /** GET with a manager's sign-in token → every paid checkout of the last 13 months, by invoice number. */
 export function createPaymentsHandler(deps: Deps = defaultDeps): Handler {
-  return withCors(async (req) => {
+  return async (req) => {
     if (req.method !== 'GET') return fail(405, 'Use GET.')
     const manager = await deps.verifyManager(req)
     if (!manager) return fail(401, 'Sign in to the manager portal to see payments.', 'unauthorized')
@@ -162,5 +162,5 @@ export function createPaymentsHandler(deps: Deps = defaultDeps): Handler {
       const failure = describeHelcimError(error)
       return fail(failure.status, failure.error, failure.code)
     }
-  })
+  }
 }

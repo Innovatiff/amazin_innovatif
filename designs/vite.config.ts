@@ -17,7 +17,9 @@ export default defineConfig({
       transformIndexHtml: (html) => html.replaceAll('__SITE_NAME__', site.name),
     },
   ],
-  server: { port: 5173 },
+  // `npm run dev:designs`: the payment function is reached through the local emulators
+  // (`npm run emulators` in another terminal), exactly as on the live site.
+  server: { port: 5173, proxy: { '/api': 'http://127.0.0.1:5000' } },
   build: {
     outDir: '../public/studio',
     emptyOutDir: true,

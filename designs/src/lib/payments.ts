@@ -1,18 +1,18 @@
 import { getIdToken } from './auth'
-import { PAYMENTS_URL } from './site'
 
 // Card payments run through Helcim. The browser never sees the Helcim API token and never
-// decides what is charged: it sends only the checkout's id to the payment functions
-// (payments/ in this repository), which read the order from the database, ask Helcim to open
-// a payment for that amount, and later ask Helcim whether it was paid.
+// decides what is charged: it sends only the checkout's id to the payment function
+// (payments/ in this repository), which reads the order from the database, asks Helcim to open
+// a payment for that amount, and later asks Helcim whether it was paid.
 
-const FUNCTIONS = PAYMENTS_URL ? `${PAYMENTS_URL}/.netlify/functions` : ''
+/** The payment function, on the site's own address (see "rewrites" in firebase.json). */
+const API = '/api'
 const HELCIM_SCRIPT = 'https://secure.helcim.app/helcim-pay/services/start.js'
 
 export type PaymentState = 'paid' | 'unpaid' | 'unknown'
 
 export interface PaymentStatus {
-  /** False until the payment functions and the Helcim API token are set up. */
+  /** False until the payment function has been published with a Helcim API token. */
   configured: boolean
   state: PaymentState
   amount?: number
@@ -39,14 +39,16 @@ export class PaymentError extends Error {
 }
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!FUNCTIONS) throw new PaymentError('Online payment isn’t switched on yet.', 'not_configured')
   let res: Response
   try {
-    res = await fetch(`${FUNCTIONS}/${path}`, { ...init, headers: { accept: 'application/json', ...(init?.headers ?? {}) } })
+    res = await fetch(`${API}/${path}`, { ...init, headers: { accept: 'application/json', ...(init?.headers ?? {}) } })
   } catch {
     throw new PaymentError('Could not reach the payment service. Check your connection and try again.', 'network')
   }
   if (!(res.headers.get('content-type') ?? '').includes('application/json')) {
+    // The function always answers in JSON. "Not found" in any other form means it has not been
+    // published yet (see "Card payments" in the README).
+    if (res.status === 404 || res.status === 403) throw new PaymentError('Online payment isn’t switched on yet.', 'not_configured')
     throw new PaymentError('The payment service did not answer as expected. Try again in a moment.', 'unavailable')
   }
   const body = (await res.json().catch(() => ({}))) as Record<string, unknown>
@@ -124,7 +126,7 @@ export type PaymentOutcome = { result: 'paid'; transactionId: string } | { resul
 /**
  * Opens Helcim's secure payment window for the order and waits until the buyer pays, is declined
  * or closes it. "paid" here only means Helcim's window said so; the page then confirms it with
- * the payment functions (see fetchPaymentStatus), which ask Helcim directly.
+ * the payment function (see fetchPaymentStatus), which asks Helcim directly.
  */
 export async function startPayment(checkoutId: string): Promise<PaymentOutcome> {
   const { checkoutToken } = await call<{ checkoutToken: string }>('checkout-create', {
@@ -161,30 +163,34 @@ export async function startPayment(checkoutId: string): Promise<PaymentOutcome> 
       }
     }
     window.addEventListener('message', onMessage)
+    const notOpened = () =>
+      finish(() => reject(new PaymentError('The secure payment window could not be opened. Try again in a moment.', 'open')))
     try {
       window.appendHelcimPayIframe!(checkoutToken, true)
+      // Helcim's script quietly does nothing when it does not like the token; without its
+      // window on the page there would be nothing to wait for.
+      if (!document.getElementById('helcimPayIframe')) notOpened()
     } catch {
-      finish(() => reject(new PaymentError('The secure payment window could not be opened. Try again in a moment.', 'open')))
+      notOpened()
     }
   })
 }
 
-/** Asks the payment functions (and so Helcim) whether a checkout has been paid. */
+/** Asks the payment function (and so Helcim) whether a checkout has been paid. */
 export async function fetchPaymentStatus(checkoutId: string, transactionId?: string | null): Promise<PaymentStatus> {
-  if (!FUNCTIONS) return { configured: false, state: 'unknown' }
   const query = new URLSearchParams({ id: checkoutId })
   if (transactionId) query.set('transaction', transactionId)
   try {
     return await call<PaymentStatus>(`checkout-status?${query}`)
   } catch (error) {
     const e = error as PaymentError
+    if (e.code === 'not_configured') return { configured: false, state: 'unknown' }
     return { configured: true, state: 'unknown', error: e.message, code: e.code }
   }
 }
 
 /** Managers only: every paid checkout, keyed by its Helcim invoice number (see invoice.ts). */
 export async function fetchPaidInvoices(): Promise<Record<string, PaidInfo>> {
-  if (!FUNCTIONS) return {}
   const token = await getIdToken()
   if (!token) return {}
   const body = await call<{ payments?: Record<string, PaidInfo> }>('checkout-payments', {

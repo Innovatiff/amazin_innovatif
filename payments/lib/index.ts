@@ -1,4 +1,5 @@
-// One entry point for everything the local runner and the tests use.
+// One entry point for everything the tests use.
+export * from './adapter'
 export * from './handlers'
 export * from './helcim'
 export { invoiceNumberFor } from '../../designs/src/lib/invoice'

@@ -6,6 +6,8 @@
 import { createServer } from 'node:http';
 
 export const FAKE_TOKEN = 'test-helcim-token';
+/** Where the browser test runs it; the payment function is told this address (see run-e2e.mjs). */
+export const FAKE_PORT = 8788;
 
 /** Helcim reports times in Mountain Time, as "YYYY-MM-DD HH:MM:SS". */
 function mountainTime(date = new Date()) {
@@ -155,7 +157,8 @@ export async function startFakeHelcim({ port = 8788 } = {}) {
     const one = /^\/v2\/card-transactions\/(\d+)$/.exec(url.pathname);
     if (one && req.method === 'GET') {
       const transaction = state.transactions.find((t) => String(t.transactionId) === one[1]);
-      return transaction ? reply(res, 200, transaction) : errors(res, 404, 'Transaction not found');
+      // The real Helcim answers 400, not 404, for an id it does not know.
+      return transaction ? reply(res, 200, transaction) : errors(res, 400, `Failed to retrieve card transaction #${one[1]}.`);
     }
 
     errors(res, 404, 'Not found');
