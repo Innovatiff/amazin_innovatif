@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import type { IllustrationKey } from '../types'
 import { db } from '../lib/db'
-import { compressImage } from '../lib/image'
+import { IMAGE_ACCEPT, compressImage } from '../lib/image'
 import { ILLUSTRATIONS, Illustration, illustrationLabel } from '../lib/illustrations'
 import { Img, primeImage } from './Img'
 import { UploadIcon } from './icons'
@@ -64,7 +64,7 @@ export function ArtPicker({ value, image, onChange, onImage, idPrefix }: Props) 
           ref={inputRef}
           id={`${idPrefix}-file`}
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/gif"
+          accept={IMAGE_ACCEPT}
           hidden
           onChange={(e) => pick(e.target.files?.[0])}
         />

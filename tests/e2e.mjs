@@ -11,6 +11,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
+import sharp from 'sharp';
 import site from '../src/_data/site.js';
 import { FAKE_PORT, startFakeHelcim } from './fake-helcim.mjs';
 
@@ -431,6 +432,25 @@ await step('status and notes are saved', async () => {
   assert.equal(saved.message, 'I need 500 business cards by Friday.\nMatte finish, rounded corners.');
 });
 
+await step('a live update does not interrupt someone typing a note', async () => {
+  const notes = portal.locator('[data-notes]');
+  const active = portal.locator('.segmented button.is-active');
+  const maria = (await docs('Contact')).find((entry) => entry.name === 'Maria Lopez');
+  // Stands in for another manager changing the same message somewhere else.
+  const setStatus = (status) => fetch(`${DOCS}/Contact/${maria.id}?updateMask.fieldPaths=status`, { method: 'PATCH', headers: ADMIN, body: JSON.stringify({ fields: { status: { stringValue: status } } }) });
+  await notes.click();
+  await portal.keyboard.press('Control+End');
+  await portal.keyboard.type(' Asked for');
+  await setStatus('Done');
+  await active.getByText('Done').waitFor(); // the update has arrived and the message was redrawn
+  await portal.keyboard.type(' a proof.');
+  assert.equal(await notes.inputValue(), 'Called back, sending quote Monday. Asked for a proof.');
+  assert.ok(await notes.evaluate((element) => document.activeElement === element), 'the note field lost the keyboard');
+  await setStatus('In progress');
+  await active.getByText('In progress').waitFor();
+  assert.equal(await notes.inputValue(), 'Called back, sending quote Monday. Asked for a proof.');
+});
+
 await step('a new message appears in the portal without refreshing', async () => {
   await page.goto(`${SITE}/software`, { waitUntil: 'networkidle' });
   await page.locator('#ai-receptionist [data-quote]').click();
@@ -537,6 +557,23 @@ await step('a manager builds a checkout and gets a link for the client', async (
   await portal.locator('#k-tax').fill('13');
   await portal.getByText('Ask for a delivery address').click();
   await portal.locator('#k-countries').fill('CA, US');
+
+  // Product pictures in AVIF: a photo, and a cut-out with a see-through background that
+  // arrives without a picture label (as it does from some computers).
+  const photo = await sharp({ create: { width: 640, height: 400, channels: 3, background: { r: 200, g: 60, b: 40 } } }).avif({ quality: 50 }).toBuffer();
+  const cutOut = await sharp({ create: { width: 640, height: 400, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: Buffer.from('<svg width="300" height="300"><circle cx="150" cy="150" r="140" fill="#2997ff"/></svg>'), left: 170, top: 50 }])
+    .avif({ quality: 50 })
+    .toBuffer();
+  const products = portal.locator('.service-edit');
+  await products.nth(0).locator('input[type="file"]').setInputFiles({ name: 'logo-pack.avif', mimeType: 'image/avif', buffer: photo });
+  await products.nth(0).locator('img.upload-thumb').waitFor();
+  assert.match(await products.nth(0).locator('img.upload-thumb').getAttribute('src'), /^data:image\/jpeg;base64,/, 'an AVIF photo should be stored as a JPEG');
+  await products.nth(1).locator('input[type="file"]').setInputFiles({ name: 'CARDS.AVIF', mimeType: 'application/octet-stream', buffer: cutOut });
+  await products.nth(1).locator('img.upload-thumb').waitFor();
+  assert.match(await products.nth(1).locator('img.upload-thumb').getAttribute('src'), /^data:image\/png;base64,/, 'a see-through AVIF should keep its transparency');
+  assert.equal(await portal.locator('.artpicker .field-error').count(), 0);
+  assert.equal((await docs('images')).length, 2);
   await shot(portal, 'designs-checkout-editor');
   await portal.locator('button[type="submit"]').click();
   await portal.waitForURL(/\/checkout\/[A-Za-z0-9]+$/);
@@ -558,6 +595,8 @@ await step('the client opens the link: the order, the total, and nothing of the 
   assert.ok((await buyer.locator('.co-pay-btn').innerText()).includes(ORDER_TOTAL));
   const text = await buyer.locator('main').innerText();
   for (const expected of ['Logo design package', 'Premium business cards (box of 250)', 'Qty: 2', 'Helcim']) assert.ok(text.includes(expected), `missing “${expected}”`);
+  // The two uploaded pictures reach the client, in a format every browser shows.
+  await buyer.waitForFunction(() => [...document.querySelectorAll('.co-item img')].filter((img) => img.complete && img.naturalWidth > 0).length === 2);
   assert.ok(!/stripe/i.test(await buyer.locator('body').innerText()), 'Stripe is still mentioned');
   await shot(buyer, 'checkout-client');
 });
