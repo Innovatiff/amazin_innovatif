@@ -119,7 +119,8 @@ export async function getTransaction(access: HelcimAccess, id: string): Promise<
     const body = await request<unknown>(access, 'GET', `/card-transactions/${encodeURIComponent(id)}`)
     return body && typeof body === 'object' && !Array.isArray(body) ? (body as HelcimTransaction) : (listFrom<HelcimTransaction>(body)[0] ?? null)
   } catch (error) {
-    if (error instanceof HelcimError && error.status === 404) return null
+    // Helcim answers 400 ("Failed to retrieve card transaction #…") for an id it does not know.
+    if (error instanceof HelcimError && (error.status === 400 || error.status === 404)) return null
     throw error
   }
 }
@@ -191,9 +192,10 @@ function isRejection(error: unknown): boolean {
  * Prices come from the order as stored in the database, never from the browser, so a buyer
  * cannot change what they are charged.
  *
- * Helcim creates the invoice the first time and reuses it afterwards. Its documentation leaves
- * a few details open (for instance exactly when a new invoice starts to exist), so rather than
- * guess, this tries the most likely form first and falls back when Helcim says no:
+ * Helcim creates the invoice when the payment is made, not when the window is opened (checked
+ * against the live API), so a buyer who closes the window and comes back is sent the same
+ * request again. Once the invoice exists, it is named instead of described. If Helcim says no
+ * to the first form, the others are tried:
  *   1. with the window styling,  2. without it,  3. the other way of naming the invoice.
  * Every form charges the same amount against the same invoice number.
  */

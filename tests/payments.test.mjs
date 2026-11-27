@@ -275,6 +275,10 @@ describe('knowing what has been paid', () => {
     assert.equal((await (await status({ id: OTHER_ID })).json()).state, 'paid');
   });
 
+  test('naming a transaction Helcim has never heard of changes nothing', async () => {
+    assert.deepEqual(await (await status({ id: ORDER_ID, transaction: '999999999' })).json(), { configured: true, state: 'unpaid' });
+  });
+
   test('refuses a second payment for an order that is already paid', async () => {
     await payFor(ORDER_ID);
     const res = await create(ORDER_ID);

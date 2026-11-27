@@ -201,9 +201,10 @@ it. It should say **Paid** on the page and in Designs, and appear in Helcim as
 an invoice numbered `ORD-…`. Refund it in Helcim and the checkout goes back to
 *Awaiting payment*.
 
-> **Do this test before sending a checkout to a client.** The connection was
-> built from Helcim's documentation and is tested here against a stand-in for
-> Helcim, not against a live Helcim account.
+> **Do this test before sending a checkout to a client.** Opening a payment
+> and looking payments up have been checked against the live Helcim; a real
+> card going through has not. The automatic tests here use a stand-in for
+> Helcim.
 
 If something is off, open the checkout while signed in as a manager — the label
 at the top says what: *Card payments not set up* (the function has not been
@@ -281,7 +282,7 @@ npm test
 
 Runs 33 checks on the security rules (visitors can only send, strangers see
 nothing, managers can only change status and notes, a client can open their
-own page but never list pages or read a delivery address) and 25 checks on the
+own page but never list pages or read a delivery address) and 26 checks on the
 payment function, against a stand-in for Helcim: the amount charged, declined
 cards, refunds, paying twice, a wrong token, who may see the list of payments.
 

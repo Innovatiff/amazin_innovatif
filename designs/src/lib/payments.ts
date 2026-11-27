@@ -163,10 +163,15 @@ export async function startPayment(checkoutId: string): Promise<PaymentOutcome> 
       }
     }
     window.addEventListener('message', onMessage)
+    const notOpened = () =>
+      finish(() => reject(new PaymentError('The secure payment window could not be opened. Try again in a moment.', 'open')))
     try {
       window.appendHelcimPayIframe!(checkoutToken, true)
+      // Helcim's script quietly does nothing when it does not like the token; without its
+      // window on the page there would be nothing to wait for.
+      if (!document.getElementById('helcimPayIframe')) notOpened()
     } catch {
-      finish(() => reject(new PaymentError('The secure payment window could not be opened. Try again in a moment.', 'open')))
+      notOpened()
     }
   })
 }
