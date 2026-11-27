@@ -133,8 +133,9 @@ What you see for a checkout:
   (and *Remove the paid mark* to undo it).
 
 Everything is stored in the same Firebase project as the messages: `pages`,
-`checkouts` (with each order's `deliveries`) and `images` (pictures you upload
-are shrunk in the browser first). Pages made on the old Innovatif Designs site
+`checkouts` (with each order's `deliveries`) and `images` (pictures you upload —
+PNG, JPG, WebP, AVIF or GIF — are shrunk in the browser first, and a
+see-through background is kept). Pages made on the old Innovatif Designs site
 are not copied over automatically.
 
 ## Card payments (Helcim)

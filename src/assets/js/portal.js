@@ -311,7 +311,12 @@ function currentItem() {
 function renderDetail({ keepNotes = false } = {}) {
   const pane = $('[data-detail]');
   const item = currentItem();
-  const draft = keepNotes ? $('[data-notes]', pane)?.value : undefined;
+  // A live update redraws this pane, possibly while someone is typing a note. The note field
+  // itself is carried over untouched, so the words, the cursor and the keyboard all stay put.
+  const key = item ? `${item.tab}/${item.id}` : '';
+  const open = keepNotes ? $('[data-notes]', pane) : null;
+  const carried = open && open.dataset.notes === key ? open : null;
+  const typing = carried && document.activeElement === carried ? [carried.selectionStart, carried.selectionEnd] : null;
 
   if (!item) {
     state.selected = null;
@@ -324,8 +329,8 @@ function renderDetail({ keepNotes = false } = {}) {
   const call = telLink(item.phone);
   const whatsapp = whatsappLink(item);
   const mail = mailLink(item);
-  const notes = h('textarea', { rows: '4', maxlength: '4000', placeholder: 'Only you and other managers can see these notes.', dataset: { notes: '' } });
-  notes.value = draft ?? item.notes;
+  const notes = carried ?? h('textarea', { rows: '4', maxlength: '4000', placeholder: 'Only you and other managers can see these notes.', dataset: { notes: key } });
+  if (!carried) notes.value = item.notes;
 
   fill(
     pane,
@@ -381,6 +386,11 @@ function renderDetail({ keepNotes = false } = {}) {
       h('button', { type: 'button', class: 'link-button danger', onclick: () => remove(item) }, icon('trash'), 'Delete permanently'),
     ),
   );
+
+  if (typing) {
+    notes.focus({ preventScroll: true });
+    notes.setSelectionRange(...typing);
+  }
 }
 
 /* ── Actions ────────────────────────────────────────────────────────────── */
