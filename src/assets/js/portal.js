@@ -559,9 +559,18 @@ async function enter(user) {
     console.error(error);
     return showDenied(user);
   }
+  // Sent here to sign in from one of the Designs screens (pricing pages and
+  // checkouts): go straight back. Only this site's own Designs addresses count.
+  const next = new URLSearchParams(location.search).get('next') ?? '';
+  if (/^\/(portal\/designs|quote\/[A-Za-z0-9]+|checkout\/[A-Za-z0-9]+)(\/[a-z]+)*$/.test(next)) {
+    location.replace(next);
+    return;
+  }
   $('[data-user-email]').textContent = user.email ?? '';
   renderAlertsButton();
   view('app');
+  // "Booking leads" in the Designs screens' top bar links to /portal#bookings.
+  if (location.hash === '#bookings') $('[data-tab="Bookings"]').click();
   renderList();
   renderDetail();
   listen('Contact');
@@ -671,7 +680,7 @@ for (const tab of $$('[data-tab]')) {
     state.tab = tab.dataset.tab;
     state.selected = null;
     document.body.classList.remove('is-reading');
-    for (const other of $$('[data-tab]')) other.setAttribute('aria-selected', String(other === tab));
+    for (const other of $$('[data-tab]')) other.setAttribute('aria-pressed', String(other === tab));
     renderList();
     renderDetail();
   });

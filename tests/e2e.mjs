@@ -11,6 +11,8 @@ import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 import site from '../src/_data/site.js';
+import { startPayments } from '../scripts/payments-dev.mjs';
+import { FAKE_TOKEN, startFakeHelcim } from './fake-helcim.mjs';
 
 const SITE = 'http://127.0.0.1:5000';
 const FIRESTORE = 'http://127.0.0.1:8085';
@@ -125,6 +127,40 @@ async function shot(page, name) {
 /* ── The run ────────────────────────────────────────────────────────────── */
 
 await reset();
+
+// Card payments: the real payment functions (payments/), run on this computer and
+// pointed at a stand-in for Helcim, so the whole pay flow is exercised with no real
+// account and no real money. They read orders from the Firestore emulator, as the
+// site does here. (FIRESTORE_EMULATOR_HOST etc. are set by `firebase emulators:exec`.)
+const helcim = await startFakeHelcim({ port: 8788 });
+process.env.HELCIM_API_TOKEN = FAKE_TOKEN;
+process.env.HELCIM_API_URL = helcim.url;
+const payments = await startPayments({ port: 8787, quiet: true });
+
+// What Helcim's payment window does, without the window: it is told a token, the
+// buyer pays (or is declined, or closes it), and it reports back with a message.
+const HELCIM_WINDOW = `
+  window.appendHelcimPayIframe = (checkoutToken) => {
+    const frame = document.createElement('div');
+    frame.id = 'helcimPayIframe';
+    frame.textContent = 'Stand-in payment window';
+    document.body.append(frame);
+    const eventName = 'helcim-pay-js-' + checkoutToken;
+    const outcome = window.__helcimOutcome || 'approve';
+    setTimeout(async () => {
+      if (outcome === 'close') return window.postMessage({ eventName, eventStatus: 'HIDE', eventMessage: '' }, '*');
+      const transaction = await window.__fakeHelcimPay(checkoutToken, outcome === 'decline');
+      if (outcome === 'decline') return window.postMessage({ eventName, eventStatus: 'ABORTED', eventMessage: 'HelcimPay.js transaction failed - Transaction declined' }, '*');
+      window.postMessage({ eventName, eventStatus: 'SUCCESS', eventMessage: JSON.stringify({ status: 200, data: { data: transaction, hash: 'not-checked-in-the-browser' } }) }, '*');
+    }, 120);
+  };
+  window.removeHelcimPayIframe = () => document.getElementById('helcimPayIframe')?.remove();
+`;
+async function withHelcimWindow(target) {
+  await target.exposeFunction('__fakeHelcimPay', (checkoutToken, declined) => helcim.pay({ checkoutToken, declined }));
+  await target.route('https://secure.helcim.app/helcim-pay/services/start.js', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/javascript', body: HELCIM_WINDOW }));
+}
 
 const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
 const browser = await chromium.launch(proxy ? { proxy: { server: proxy, bypass: '127.0.0.1,localhost' } } : {});
@@ -450,6 +486,256 @@ await step('signing out closes the inbox', async () => {
   assert.equal(await portal.locator('.item').count(), 0);
 });
 
+console.log('\nDesigns (pricing pages and checkouts)');
+
+// 2 × 89.00 + 650.00 = 828.00; 13% tax = 107.64; shipping 15.00 → 950.64
+const ORDER_TOTAL = '$950.64';
+let checkoutUrl = '';
+let checkoutId = '';
+let quoteUrl = '';
+const client = await browser.newContext({ viewport: { width: 1280, height: 860 }, deviceScaleFactor: scale });
+await withHelcimWindow(client);
+const buyer = await client.newPage();
+watch(buyer, 'checkout');
+
+await step('opening Designs signed out leads to the portal sign-in, then straight back', async () => {
+  await portal.goto(`${SITE}/portal/designs`, { waitUntil: 'networkidle' });
+  await portal.waitForURL(/\/portal\?next=/);
+  await portal.locator('#p-email').fill(MANAGER.email);
+  await portal.locator('#p-password').fill(MANAGER.password);
+  await portal.locator('[data-signin-button]').click();
+  await portal.waitForURL(`${SITE}/portal/designs`);
+  await portal.getByRole('heading', { name: 'Designs', level: 1 }).waitFor();
+  // The same bar as the portal, with a way back to the inbox.
+  assert.equal(await portal.locator('.portalbar-tab[aria-current="page"]').innerText(), 'Designs');
+  assert.equal(await portal.locator('.portalbar-tab', { hasText: 'Messages' }).getAttribute('href'), '/portal');
+  await shot(portal, 'designs-home-empty');
+});
+
+await step('the portal has a Designs tab', async () => {
+  // (The inbox keeps a live connection open, so there is no "network is quiet" moment to wait for.)
+  await portal.goto(`${SITE}/portal`, { waitUntil: 'domcontentloaded' });
+  await portal.locator('[data-view="app"]').waitFor();
+  await portal.locator('a.tab', { hasText: 'Designs' }).click();
+  await portal.waitForURL(`${SITE}/portal/designs`);
+  await portal.getByRole('heading', { name: 'Designs', level: 1 }).waitFor();
+});
+
+await step('a manager builds a checkout and gets a link for the client', async () => {
+  await portal.getByRole('button', { name: 'New page' }).click();
+  await portal.getByRole('menuitem', { name: /Checkout/ }).click();
+  await portal.waitForURL(`${SITE}/portal/designs/new/checkout`);
+  await portal.locator('#k-title').fill('Brand launch kit');
+  await portal.locator('#k-client').fill('Aurora Coffee Co.');
+  assert.equal(await portal.locator('#k-currency').inputValue(), 'CAD', 'new checkouts should start in Canadian dollars');
+  assert.deepEqual(await portal.locator('#k-currency option').allInnerTexts(), ['CAD', 'USD'], 'only the currencies Helcim charges in');
+  await portal.locator('[id$="-name"]').first().fill('Logo design package');
+  await portal.locator('[id$="-price"]').first().fill('650');
+  await portal.locator('[id$="-list"]').first().fill('900');
+  await portal.locator('#k-add-item').click();
+  await portal.locator('[id$="-name"]').nth(1).fill('Premium business cards (box of 250)');
+  await portal.locator('[id$="-qty"]').nth(1).fill('2');
+  await portal.locator('[id$="-price"]').nth(1).fill('89');
+  await portal.locator('#k-shipping').fill('15');
+  await portal.locator('#k-tax').fill('13');
+  await portal.getByText('Ask for a delivery address').click();
+  await portal.locator('#k-countries').fill('CA, US');
+  await shot(portal, 'designs-checkout-editor');
+  await portal.locator('button[type="submit"]').click();
+  await portal.waitForURL(/\/checkout\/[A-Za-z0-9]+$/);
+  checkoutUrl = portal.url();
+  checkoutId = checkoutUrl.split('/').pop();
+  await portal.locator('.co-total', { hasText: ORDER_TOTAL }).waitFor();
+  // The manager sees the client's page with a toolbar above it.
+  await portal.locator('.toolbar .pill', { hasText: 'Awaiting payment' }).waitFor();
+  const [saved] = await docs('checkouts');
+  assert.equal(saved.title, 'Brand launch kit');
+  assert.equal(saved.currency, 'CAD');
+});
+
+await step('the client opens the link: the order, the total, and nothing of the manager’s', async () => {
+  await buyer.goto(checkoutUrl, { waitUntil: 'networkidle' });
+  await buyer.locator('.co-total', { hasText: ORDER_TOTAL }).waitFor();
+  assert.equal(await buyer.locator('.toolbar').count(), 0, 'a client must not see the manager toolbar');
+  assert.equal(await buyer.locator('.portalbar').count(), 0);
+  assert.ok((await buyer.locator('.co-pay-btn').innerText()).includes(ORDER_TOTAL));
+  const text = await buyer.locator('main').innerText();
+  for (const expected of ['Logo design package', 'Premium business cards (box of 250)', 'Qty: 2', 'Helcim']) assert.ok(text.includes(expected), `missing “${expected}”`);
+  assert.ok(!/stripe/i.test(await buyer.locator('body').innerText()), 'Stripe is still mentioned');
+  await shot(buyer, 'checkout-client');
+});
+
+await step('paying needs a delivery address first', async () => {
+  await buyer.locator('.co-pay-btn').click();
+  await buyer.locator('.co-address [role="alert"]', { hasText: 'name of the person' }).waitFor();
+  assert.equal(helcim.state.requests.length, 0, 'no payment may be opened before the address is complete');
+  await buyer.locator('#d-name').fill('Maria Lopez');
+  await buyer.locator('#d-line1').fill('12 King Street West');
+  await buyer.locator('#d-city').fill('Toronto');
+  await buyer.locator('#d-region').fill('ON');
+  await buyer.locator('#d-postalCode').fill('M5H 1A1');
+  await buyer.locator('#d-country').selectOption('CA');
+});
+
+await step('a declined card, or closing the window, leaves the order unpaid', async () => {
+  await buyer.evaluate(() => { window.__helcimOutcome = 'decline'; });
+  await buyer.locator('.co-pay-btn').click();
+  await buyer.locator('.co-pay-error', { hasText: 'did not go through' }).waitFor();
+  assert.equal(await buyer.locator('#helcimPayIframe').count(), 0, 'the payment window should be closed again');
+  await buyer.evaluate(() => { window.__helcimOutcome = 'close'; });
+  await buyer.locator('.co-pay-btn').click();
+  await buyer.getByText('Payment canceled.').waitFor();
+  assert.equal(await buyer.locator('.co-paid').count(), 0);
+});
+
+await step('the client pays in Helcim’s window and sees the order as paid', async () => {
+  await buyer.evaluate(() => { window.__helcimOutcome = 'approve'; });
+  await buyer.locator('.co-pay-btn').click();
+  await buyer.getByText('Thank you! Your order is placed.').waitFor();
+  await buyer.locator('.co-paid', { hasText: 'Paid' }).waitFor();
+  assert.equal(await buyer.locator('.co-pay-btn').count(), 0, 'the pay button should be gone');
+  // What Helcim was asked to charge comes from the stored order, to the cent.
+  const sent = helcim.state.requests.at(-1);
+  assert.equal(helcim.state.requests[0].amount, 950.64);
+  assert.equal(sent.currency, 'CAD');
+  assert.equal(helcim.state.invoices.size, 1, 'three attempts, one invoice');
+  await shot(buyer, 'checkout-paid');
+});
+
+await step('after a refresh the order is still paid, and cannot be paid twice', async () => {
+  await buyer.reload({ waitUntil: 'networkidle' });
+  await buyer.locator('.co-paid', { hasText: 'Paid' }).waitFor();
+  assert.equal(await buyer.locator('.co-pay-btn').count(), 0);
+  const again = await fetch('http://127.0.0.1:8787/.netlify/functions/checkout-create', {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: checkoutId }),
+  });
+  assert.equal(again.status, 409);
+});
+
+await step('the manager sees it paid, with the delivery address the client entered', async () => {
+  await portal.reload({ waitUntil: 'networkidle' });
+  // (How the amount is written follows the viewer's own language settings: "$950.64" or "CA$950.64".)
+  await portal.locator('.toolbar .pill', { hasText: /^Paid · \D*950\.64$/ }).waitFor();
+  const delivery = await portal.locator('.toolbar-delivery').innerText();
+  for (const part of ['Maria Lopez', '12 King Street West', 'Toronto', 'M5H 1A1', 'Canada']) assert.ok(delivery.includes(part), `delivery line is missing “${part}”: ${delivery}`);
+  await shot(portal, 'checkout-manager-paid');
+  await portal.locator('.toolbar a', { hasText: 'All pages' }).click();
+  await portal.locator('.card', { hasText: 'Brand launch kit' }).locator('.pill', { hasText: 'Paid' }).waitFor();
+  await shot(portal, 'designs-home');
+});
+
+await step('a client cannot read delivery addresses or the list of pages', async () => {
+  assert.deepEqual(problems, [], 'nothing should have gone wrong up to here');
+  const result = await buyer.evaluate(async (id) => {
+    const base = 'http://127.0.0.1:8085/v1/projects/demo-innovatif/databases/(default)/documents';
+    const statuses = [];
+    for (const path of [`checkouts/${id}/deliveries`, 'checkouts', 'pages', 'images']) statuses.push((await fetch(`${base}/${path}`)).status);
+    statuses.push((await fetch(`${base}/checkouts/${id}`)).status); // their own checkout, by its address: allowed
+    return statuses;
+  }, checkoutId);
+  assert.deepEqual(result, [403, 403, 403, 403, 200]);
+  problems.length = 0; // the four refusals above are the point of this check
+});
+
+await step('a manager can mark a checkout as paid by hand (cash or e-transfer)', async () => {
+  await portal.locator('.card', { hasText: 'Brand launch kit' }).click();
+  await portal.getByRole('button', { name: 'More actions' }).click();
+  await portal.getByRole('menuitem', { name: 'Duplicate checkout' }).click();
+  await portal.waitForURL(/\/checkout\/[A-Za-z0-9]+\/edit$/);
+  await portal.locator('#k-title').fill('Cash order');
+  await portal.locator('button[type="submit"]').click();
+  await portal.waitForURL(/\/checkout\/[A-Za-z0-9]+$/);
+  const cashUrl = portal.url();
+  await portal.locator('.toolbar .pill', { hasText: 'Awaiting payment' }).waitFor();
+  await portal.getByRole('button', { name: 'More actions' }).click();
+  await portal.getByRole('menuitem', { name: 'Mark as paid' }).click();
+  await portal.locator('.toolbar .pill', { hasText: 'marked by hand' }).waitFor();
+  // The client sees it paid and is not offered the pay button; the payment functions agree.
+  await buyer.goto(cashUrl, { waitUntil: 'networkidle' });
+  await buyer.locator('.co-paid', { hasText: 'Paid' }).waitFor();
+  assert.equal(await buyer.locator('.co-pay-btn').count(), 0);
+  const refused = await fetch('http://127.0.0.1:8787/.netlify/functions/checkout-create', {
+    method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: cashUrl.split('/').pop() }),
+  });
+  assert.equal(refused.status, 409);
+});
+
+await step('a manager builds a pricing page and the client can open it', async () => {
+  await portal.goto(`${SITE}/portal/designs/new`, { waitUntil: 'networkidle' });
+  await portal.locator('#f-title').fill('Website and print package');
+  await portal.locator('#f-client').fill('North Build');
+  await portal.locator('[id$="-name"]').first().fill('Five-page website');
+  await portal.locator('[id$="-price"]').first().fill('1200');
+  await portal.locator('[id$="-market"]').first().fill('2500');
+  await shot(portal, 'designs-quote-editor');
+  await portal.locator('button[type="submit"]').click();
+  await portal.waitForURL(/\/quote\/[A-Za-z0-9]+$/);
+  quoteUrl = portal.url();
+  await buyer.goto(quoteUrl, { waitUntil: 'networkidle' });
+  await buyer.getByRole('heading', { name: 'Website and print package' }).waitFor();
+  assert.equal(await buyer.locator('.toolbar').count(), 0);
+  const text = await buyer.locator('body').innerText();
+  for (const expected of ['Five-page website', '1,200', '2,500', site.name]) assert.ok(text.includes(expected), `missing “${expected}”`);
+  await shot(buyer, 'quote-client');
+});
+
+// How wide the page really is. (A phone zooms out to fit a page that is too wide,
+// so the page has to be measured against the phone, not against its own window.)
+const pageWidth = (target) => target.evaluate(() => document.documentElement.scrollWidth);
+
+await step('what the client opens fits a phone screen', async () => {
+  for (const width of [390, 320]) {
+    const phone = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: scale });
+    const mobile = await phone.newPage();
+    watch(mobile, `client pages at ${width}px`);
+    await mobile.goto(checkoutUrl, { waitUntil: 'networkidle' });
+    await mobile.locator('.co-total', { hasText: ORDER_TOTAL }).waitFor();
+    assert.ok(await pageWidth(mobile) <= width, `the checkout is ${await pageWidth(mobile)}px wide on a ${width}px phone`);
+    if (width === 390) await shot(mobile, 'checkout-phone');
+    await mobile.goto(quoteUrl, { waitUntil: 'networkidle' });
+    await mobile.getByRole('heading', { name: 'Website and print package' }).waitFor();
+    assert.ok(await pageWidth(mobile) <= width, `the pricing page is ${await pageWidth(mobile)}px wide on a ${width}px phone`);
+    if (width === 390) await shot(mobile, 'quote-phone');
+    await phone.close();
+  }
+});
+
+await step('the manager’s screens fit a phone too', async () => {
+  const signedIn = await context.storageState({ indexedDB: true });
+  for (const width of [390, 320]) {
+    const phone = await browser.newContext({ viewport: { width, height: 844 }, isMobile: true, hasTouch: true, storageState: signedIn });
+    const mobile = await phone.newPage();
+    watch(mobile, `manager screens at ${width}px`);
+    for (const [path, ready] of [
+      ['/portal/designs', '.card'],
+      [new URL(checkoutUrl).pathname, '.toolbar .pill'],
+      [new URL(quoteUrl).pathname, '.toolbar'],
+      [`${new URL(checkoutUrl).pathname}/edit`, '#k-title'],
+      [`${new URL(quoteUrl).pathname}/edit`, '#f-title'],
+      ['/portal', '.tabs'],
+    ]) {
+      await mobile.goto(SITE + path, { waitUntil: 'domcontentloaded' });
+      await mobile.locator(ready).first().waitFor();
+      await mobile.waitForTimeout(300);
+      assert.ok(await pageWidth(mobile) <= width, `${path} is ${await pageWidth(mobile)}px wide on a ${width}px phone`);
+    }
+    if (width === 390) {
+      await mobile.goto(SITE + new URL(checkoutUrl).pathname, { waitUntil: 'domcontentloaded' });
+      await mobile.locator('.toolbar .pill').waitFor();
+      await shot(mobile, 'checkout-manager-phone');
+    }
+    await phone.close();
+  }
+});
+
+await step('only the Designs addresses are allowed to load Helcim', async () => {
+  const policy = async (path) => (await fetch(SITE + path)).headers.get('content-security-policy') ?? '';
+  for (const path of ['/portal/designs', `/checkout/${checkoutId}`, '/quote/anything']) {
+    assert.ok((await policy(path)).includes('https://secure.helcim.app'), `${path} cannot load Helcim’s payment window`);
+  }
+  for (const path of ['/', '/printing', '/portal']) assert.ok(!(await policy(path)).includes('helcim'), `${path} should keep the site’s strict policy`);
+});
+
 await step('no browser errors or blocked requests along the way', async () => {
   assert.deepEqual(problems, []);
 });
@@ -528,7 +814,7 @@ await step('the menu and message form work at phone size', async () => {
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const mobile = await phone.newPage();
   await mobile.goto(SITE, { waitUntil: 'networkidle' });
-  assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, 'page scrolls sideways');
+  assert.ok(await pageWidth(mobile) <= 390, 'page scrolls sideways');
   // People open the menu halfway down a page, so test it there — with a real
   // tap, because a scripted click would scroll the page itself first.
   await mobile.evaluate(() => window.scrollTo({ top: 1500, behavior: 'instant' }));
@@ -561,6 +847,8 @@ await step('the menu and message form work at phone size', async () => {
 });
 
 await browser.close();
+await payments.close();
+await helcim.close();
 
 const failed = results.filter(([ok]) => !ok);
 console.log(`\n${results.length - failed.length} of ${results.length} checks passed.`);
